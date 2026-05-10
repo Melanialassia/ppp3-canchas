@@ -1,17 +1,28 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import axios from "axios";
 
 export default function Home() {
   const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/reservas`)
-      .then((res) => res.json())
-      .then((data) => setData(data))
-      .catch((error) => console.error(error))
-      .finally(() => setLoading(false));
+    const fetchReservas = async () => {
+      try {
+        const response = await axios.get(
+          `${process.env.NEXT_PUBLIC_API_URL}reservas`
+        );
+console.log("Respuesta de la API:", response.data);
+        setData(response?.data);
+      } catch (error) {
+        console.error("Error al obtener reservas:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchReservas();
   }, []);
 
   if (loading) {
