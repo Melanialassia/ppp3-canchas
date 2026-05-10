@@ -11,9 +11,9 @@ export default function Home() {
     const fetchReservas = async () => {
       try {
         const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_API_URL}reservas`
+          "https://api-gateway-facu.onrender.com/reservas",
         );
-console.log("Respuesta de la API:", response.data);
+
         setData(response?.data);
       } catch (error) {
         console.error("Error al obtener reservas:", error);
@@ -60,8 +60,8 @@ console.log("Respuesta de la API:", response.data);
           <h2>Reserva #{item.id}</h2>
 
           <p>
-            <strong>Cliente:</strong>{" "}
-            {item.cliente.nombre} {item.cliente.apellido}
+            <strong>Cliente:</strong> {item.cliente.nombre}{" "}
+            {item.cliente.apellido}
           </p>
 
           <p>
@@ -73,8 +73,7 @@ console.log("Respuesta de la API:", response.data);
           </p>
 
           <p>
-            <strong>Horario:</strong>{" "}
-            {item.hora_inicio} - {item.hora_fin}
+            <strong>Horario:</strong> {item.hora_inicio} - {item.hora_fin}
           </p>
 
           <p>
