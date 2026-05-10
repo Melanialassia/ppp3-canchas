@@ -4,13 +4,32 @@ import { useEffect, useState } from "react";
 
 export default function Home() {
   const [data, setData] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch(`${process.env.BASE_URL}/reservas`)
+    fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/reservas`)
       .then((res) => res.json())
       .then((data) => setData(data))
-      .catch((error) => console.error(error));
+      .catch((error) => console.error(error))
+      .finally(() => setLoading(false));
   }, []);
+
+  if (loading) {
+    return (
+      <div
+        style={{
+          height: "100vh",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          fontSize: "24px",
+          fontFamily: "Arial",
+        }}
+      >
+        Cargando reservas...
+      </div>
+    );
+  }
 
   return (
     <div>
