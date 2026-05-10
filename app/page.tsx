@@ -6,7 +6,7 @@ export default function Home() {
   const [data, setData] = useState<any[]>([]);
 
   useEffect(() => {
-    fetch("https://api-gateway-facu.onrender.com/reservas")
+    fetch(`${process.env.BASE_URL}/reservas`)
       .then((res) => res.json())
       .then((data) => setData(data))
       .catch((error) => console.error(error));
