@@ -51,7 +51,7 @@ export function MisReservasPage() {
       <Header />
       {AlertComponent}
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+      <div className="w-full mx-auto px-4 sm:px-6 py-6 sm:py-8">
         <div className="flex justify-between items-center mb-6">
           <div>
             <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight">
@@ -110,7 +110,7 @@ export function MisReservasPage() {
                         {DateUtils.formatearFecha(r.fecha)}
                       </td>
                       <td className="font-mono text-[13px]">
-                        {r.horaInicio} – {r.horaFin}
+                        {DateUtils.formatearHora(r.horaInicio)} – {DateUtils.formatearHora(r.horaFin)}
                       </td>
                       <td>{nombreCancha(r.canchaId)}</td>
                       <td>
@@ -152,8 +152,8 @@ export function MisReservasPage() {
                         {nombreCancha(r.canchaId)}
                       </p>
                       <p className="text-slate-400 text-[12px] mt-0.5">
-                        {DateUtils.formatearFecha(r.fecha)} · {r.horaInicio} –{" "}
-                        {r.horaFin}
+                        {DateUtils.formatearFecha(r.fecha)} · {DateUtils.formatearHora(r.horaInicio)} –{" "}
+                        {DateUtils.formatearHora(r.horaFin)}
                       </p>
                     </div>
                     <BadgeReserva estado={r.estado} />

@@ -10,8 +10,8 @@ interface Props {
 export function ProtectedRoute({ children, requiredRole }: Props) {
   const { sesion } = useAuth()
 
-  if (!sesion) return <Navigate to="/login" replace />
-  if (requiredRole && sesion.rol !== requiredRole) return <Navigate to="/" replace />
+  if (!sesion) return <Navigate to="/forbidden" replace />
+  if (requiredRole && sesion.rol !== requiredRole) return <Navigate to="/forbidden" replace />
 
   return <>{children}</>
 }

@@ -100,7 +100,7 @@ export function DashboardTab() {
               <tbody>
                 {reservasHoy.map(r => (
                   <tr key={r.id}>
-                    <td className="font-mono text-[13px] font-semibold text-slate-700">{r.horaInicio} – {r.horaFin}</td>
+                    <td className="font-mono text-[13px] font-semibold text-slate-700">{DateUtils.formatearHora(r.horaInicio)} – {DateUtils.formatearHora(r.horaFin)}</td>
                     <td>{r.canchaNombre ?? `Cancha #${r.canchaId}`}</td>
                     <td className="font-medium">{r.clienteNombre ?? `Cliente #${r.clienteId}`}</td>
                     <td><BadgeReserva estado={r.estado} /></td>

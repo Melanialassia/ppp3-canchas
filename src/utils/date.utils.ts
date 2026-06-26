@@ -26,6 +26,11 @@ export const DateUtils = {
     return fecha === DateUtils.fechaHoy()
   },
 
+  formatearHora(hora: string): string {
+    if (!hora) return ''
+    return hora.slice(0, 5)
+  },
+
   calcularDuracion(horaInicio: string, horaFin: string): number {
     const [h1, m1] = horaInicio.split(':').map(Number)
     const [h2, m2] = horaFin.split(':').map(Number)

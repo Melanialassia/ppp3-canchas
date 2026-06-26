@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext'
 import { ProtectedRoute } from './components/auth/ProtectedRoute'
 import { HomePage } from './pages/Home/HomePage'
@@ -6,6 +6,8 @@ import { LoginPage } from './pages/Login/LoginPage'
 import { ReservarPage } from './pages/Reservar/ReservarPage'
 import { MisReservasPage } from './pages/MisReservas/MisReservasPage'
 import { AdminPage } from './pages/Admin/AdminPage'
+import { NotFoundPage } from './pages/NotFound/NotFoundPage'
+import { ForbiddenPage } from './pages/NotFound/ForbiddenPage'
 
 export default function App() {
   return (
@@ -38,7 +40,8 @@ export default function App() {
               </ProtectedRoute>
             }
           />
-          <Route path="*" element={<Navigate to="/" replace />} />
+          <Route path="/forbidden" element={<ForbiddenPage />} />
+          <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>

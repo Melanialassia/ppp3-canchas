@@ -43,7 +43,6 @@ export function LoginPage() {
   const { mostrar, AlertComponent } = useAlert();
   const [tab, setTab] = useState<Tab>("login");
   const [cargando, setCargando] = useState(false);
-
   const [loginForm, setLoginForm] = useState({ email: "", password: "" });
   const [loginErr, setLoginErr] = useState<LoginErrors>(L0);
 

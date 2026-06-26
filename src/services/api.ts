@@ -21,8 +21,9 @@ api.interceptors.response.use(
   (err) => {
     const msg = err.response?.data?.message ?? "Error en la petición";
     if (err.response?.status === 401) {
+      const hadSession = !!sessionStorage.getItem("sesion");
       sessionStorage.removeItem("sesion");
-      window.location.href = "/login";
+      if (hadSession) window.location.href = "/login";
     }
     return Promise.reject(new Error(msg));
   },

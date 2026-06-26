@@ -89,7 +89,7 @@ export function Paso3Resumen({ cliente, reserva, onBack }: Props) {
         />
         <InfoRow
           label="Horario"
-          value={`${reserva.horaInicio} – ${reserva.horaFin}`}
+          value={`${DateUtils.formatearHora(reserva.horaInicio)} – ${DateUtils.formatearHora(reserva.horaFin)}`}
         />
         <InfoRow
           label="Duración"

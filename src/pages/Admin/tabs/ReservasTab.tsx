@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { useReservas } from '../../../hooks/useReservas'
 import { ReservasService } from '../../../services/reservas.service'
 import { PagosService, type MetodoPago } from '../../../services/pagos.service'
@@ -9,6 +9,70 @@ import { useAlert } from '../../../components/ui/Alert'
 import { DateUtils } from '../../../utils/date.utils'
 import { MoneyUtils } from '../../../utils/money.utils'
 import type { Reserva } from '../../../types/api'
+
+interface AccionItem {
+  label: string
+  onClick: () => void
+  variant?: 'default' | 'danger'
+}
+
+function DotsMenu({ acciones }: { acciones: AccionItem[] }) {
+  const [open, setOpen] = useState(false)
+  const ref = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!open) return
+    function handleMouseDown(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        setOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleMouseDown)
+    return () => document.removeEventListener('mousedown', handleMouseDown)
+  }, [open])
+
+  if (acciones.length === 0) return <span />
+
+  return (
+    <div ref={ref} className="relative">
+      <button
+        onClick={() => setOpen(v => !v)}
+        className="p-1.5 rounded hover:bg-slate-100 text-slate-400 hover:text-slate-700 transition-colors"
+        aria-label="Acciones"
+      >
+        <svg width="4" height="16" viewBox="0 0 4 16" fill="currentColor">
+          <circle cx="2" cy="2" r="1.5" />
+          <circle cx="2" cy="8" r="1.5" />
+          <circle cx="2" cy="14" r="1.5" />
+        </svg>
+      </button>
+      {open && (
+        <div className="absolute left-0 top-full mt-1 z-50 min-w-[150px] bg-white rounded-lg shadow-lg border border-slate-200 py-1 overflow-hidden">
+          {acciones.map(item => (
+            <button
+              key={item.label}
+              className={`w-full text-left px-4 py-2 text-[13px] transition-colors ${
+                item.variant === 'danger'
+                  ? 'text-red-600 hover:bg-red-50'
+                  : 'text-slate-700 hover:bg-slate-50'
+              }`}
+              onClick={() => { setOpen(false); item.onClick() }}
+            >
+              {item.label}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
+interface ConfirmModal {
+  id: number
+  estado: string
+  titulo: string
+  mensaje: string
+}
 
 export function ReservasTab() {
   const { mostrar, AlertComponent } = useAlert()
@@ -24,14 +88,27 @@ export function ReservasTab() {
   const [metodoPago, setMetodoPago] = useState('efectivo')
   const [procesando, setProcesando] = useState(false)
 
+  const [confirmModal, setConfirmModal] = useState<ConfirmModal | null>(null)
+  const [ejecutando, setEjecutando] = useState(false)
+
+  const [ordenFecha, setOrdenFecha] = useState<'desc' | 'asc'>('desc')
+  const reservasOrdenadas = [...reservas].sort((a, b) =>
+    ordenFecha === 'desc'
+      ? b.fecha.localeCompare(a.fecha)
+      : a.fecha.localeCompare(b.fecha)
+  )
+
   async function accion(id: number, estado: string) {
-    if (!confirm(`¿Confirmar acción "${estado}" para reserva #${id}?`)) return
+    setEjecutando(true)
     try {
       await ReservasService.actualizarEstado(id, estado)
       mostrar('Estado actualizado', 'success')
       recargar()
     } catch (err) {
       mostrar((err as Error).message, 'error')
+    } finally {
+      setEjecutando(false)
+      setConfirmModal(null)
     }
   }
 
@@ -48,6 +125,61 @@ export function ReservasTab() {
     } finally {
       setProcesando(false)
     }
+  }
+
+  function getAcciones(r: Reserva): AccionItem[] {
+    const items: AccionItem[] = []
+
+    if (r.estado === 'pendiente') {
+      items.push({
+        label: 'Confirmar',
+        onClick: () => { setModalPago(r); setMontoPago(String(r.senaRequerida ?? '')) },
+      })
+      items.push({
+        label: 'Cancelar',
+        variant: 'danger',
+        onClick: () => setConfirmModal({
+          id: r.id,
+          estado: 'cancelada',
+          titulo: 'Cancelar reserva',
+          mensaje: `¿Querés cancelar la reserva #${r.id}? Esta acción no se puede deshacer.`,
+        }),
+      })
+    }
+
+    if (r.estado === 'confirmada') {
+      items.push({
+        label: 'Completar',
+        onClick: () => setConfirmModal({
+          id: r.id,
+          estado: 'completada',
+          titulo: 'Completar reserva',
+          mensaje: `¿Querés marcar la reserva #${r.id} como completada?`,
+        }),
+      })
+      items.push({
+        label: 'Cancelar',
+        variant: 'danger',
+        onClick: () => setConfirmModal({
+          id: r.id,
+          estado: 'cancelada',
+          titulo: 'Cancelar reserva',
+          mensaje: `¿Querés cancelar la reserva #${r.id}? Esta acción no se puede deshacer.`,
+        }),
+      })
+      items.push({
+        label: 'No Mostrar',
+        variant: 'danger',
+        onClick: () => setConfirmModal({
+          id: r.id,
+          estado: 'no_show',
+          titulo: 'Marcar como No Show',
+          mensaje: `¿Querés marcar la reserva #${r.id} como No Show?`,
+        }),
+      })
+    }
+
+    return items
   }
 
   return (
@@ -81,60 +213,69 @@ export function ReservasTab() {
           <table className="table">
             <thead>
               <tr>
-                <th>#</th>
-                <th>Fecha</th>
-                <th>Horario</th>
+                <th style={{ width: 40 }} />
+                <th>
+                  <button
+                    onClick={() => setOrdenFecha(v => v === 'desc' ? 'asc' : 'desc')}
+                    className="flex items-center gap-1 font-semibold text-inherit hover:text-brand-700 transition-colors bg-transparent border-none cursor-pointer p-0"
+                  >
+                    Fecha
+                    <span className="text-slate-400 text-[11px]">
+                      {ordenFecha === 'desc' ? '↓' : '↑'}
+                    </span>
+                  </button>
+                </th>
+                <th>Horario inicio</th>
+                <th>Horario finalización</th>
                 <th>Cancha</th>
                 <th>Cliente</th>
                 <th>Estado</th>
                 <th>Total</th>
-                <th>Acciones</th>
               </tr>
             </thead>
             <tbody>
-              {reservas.length === 0 ? (
+              {reservasOrdenadas.length === 0 ? (
                 <tr><td colSpan={8} className="text-center py-8 text-slate-400">No se encontraron reservas</td></tr>
-              ) : reservas.map(r => (
+              ) : reservasOrdenadas.map(r => (
                 <tr key={r.id}>
-                  <td>{r.id}</td>
+                  <td>
+                    <DotsMenu acciones={getAcciones(r)} />
+                  </td>
                   <td>{DateUtils.formatearFecha(r.fecha)}</td>
-                  <td>{r.horaInicio} - {r.horaFin}</td>
-                  <td>{r.canchaNombre ?? `Cancha #${r.canchaId}`}</td>
+                  <td>{DateUtils.formatearHora(r.horaInicio)}</td>
+                  <td>{DateUtils.formatearHora(r.horaFin)}</td>
+                  <td>{r.canchaNombre ?? `${r.canchaId}`}</td>
                   <td>{r.clienteNombre ?? `Cliente #${r.clienteId}`}</td>
                   <td><BadgeReserva estado={r.estado} /></td>
                   <td>{MoneyUtils.formatear(r.precioTotal)}</td>
-                  <td>
-                    <div className="flex gap-1.5 flex-wrap">
-                      {r.estado === 'pendiente' && (
-                        <button
-                          className="btn btn-small btn-primary"
-                          onClick={() => { setModalPago(r); setMontoPago(String(r.senaRequerida ?? '')); }}
-                        >
-                          Confirmar
-                        </button>
-                      )}
-                      {r.estado === 'confirmada' && (
-                        <button className="btn btn-small btn-success" onClick={() => accion(r.id, 'completada')}>
-                          Completar
-                        </button>
-                      )}
-                      {(r.estado === 'confirmada' || r.estado === 'pendiente') && (
-                        <button className="btn btn-small btn-danger" onClick={() => accion(r.id, 'cancelada')}>
-                          Cancelar
-                        </button>
-                      )}
-                      {r.estado === 'confirmada' && (
-                        <button className="btn btn-small btn-outline" onClick={() => accion(r.id, 'no_show')}>
-                          No Show
-                        </button>
-                      )}
-                    </div>
-                  </td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
+      )}
+
+      {confirmModal && (
+        <Modal
+          titulo={confirmModal.titulo}
+          onClose={() => setConfirmModal(null)}
+          footer={
+            <div className="flex gap-2 justify-end">
+              <button className="btn btn-outline" onClick={() => setConfirmModal(null)} disabled={ejecutando}>
+                Cancelar
+              </button>
+              <button
+                className="btn btn-primary"
+                onClick={() => accion(confirmModal.id, confirmModal.estado)}
+                disabled={ejecutando}
+              >
+                {ejecutando ? '...' : 'Aceptar'}
+              </button>
+            </div>
+          }
+        >
+          <p className="text-slate-600">{confirmModal.mensaje}</p>
+        </Modal>
       )}
 
       {modalPago && (

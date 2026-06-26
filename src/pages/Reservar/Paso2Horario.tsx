@@ -272,7 +272,7 @@ export function Paso2Horario({ onNext, onBack }: Props) {
             <div className="bg-brand-50 border border-brand-100 rounded-xl px-4 py-3 flex items-center justify-between mt-2">
               <span className="text-[13.5px] text-brand-800 font-medium">
                 {DateUtils.calcularDuracion(horaInicio, horaFin)}h ·{" "}
-                {horaInicio} a {horaFin}
+                {DateUtils.formatearHora(horaInicio)} a {DateUtils.formatearHora(horaFin)}
               </span>
               <span className="text-lg font-extrabold text-brand-700">
                 {MoneyUtils.formatear(
