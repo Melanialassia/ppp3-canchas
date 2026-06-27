@@ -54,3 +54,6 @@ export interface ApiError {
   message: string
   statusCode?: number
 }
+
+export type MetodoPago = 'efectivo' | 'tarjeta' | 'transferencia'
+export type TipoPago   = 'seña' | 'saldo' | 'completo' | 'devolucion'

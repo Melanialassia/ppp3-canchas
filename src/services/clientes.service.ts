@@ -1,5 +1,5 @@
 import api from "./api";
-import type { Cliente } from "../types/api";
+import type { Cliente } from '@/types'
 
 export const ClientesService = {
   async obtenerTodos(params: Record<string, string> = {}): Promise<Cliente[]> {
@@ -29,11 +29,6 @@ export const ClientesService = {
 
   async cambiarEstado(id: number, estado: string): Promise<Cliente> {
     const { data } = await api.patch(`/clientes/${id}`, { estado });
-    return data;
-  },
-
-  async obtenerEstadisticas(id: number): Promise<unknown> {
-    const { data } = await api.get(`/clientes/${id}/estadisticas`);
     return data;
   },
 };

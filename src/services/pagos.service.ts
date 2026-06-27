@@ -1,27 +1,26 @@
-import api from "./api";
+import api from './api'
+import type { MetodoPago, TipoPago } from '@/types'
 
-export type MetodoPago = "efectivo" | "tarjeta" | "transferencia";
-export type TipoPago = "seña" | "saldo" | "completo" | "devolucion";
+export type { MetodoPago, TipoPago }
 
 export const PagosService = {
-  // Registrar un pago. api-pagos confirma la reserva automáticamente si se cubre la seña.
   async registrar(
     reservaId: number,
     monto: number,
     metodoPago: MetodoPago,
-    tipoPago: TipoPago = "seña",
+    tipoPago: TipoPago = 'seña',
   ) {
-    const { data } = await api.post("/pagos", {
+    const { data } = await api.post('/pagos', {
       reservaId,
       monto,
       tipoPago,
       metodoPago,
-    });
-    return data.data ?? data;
+    })
+    return data.data ?? data
   },
 
   async obtenerPorReserva(reservaId: number) {
-    const { data } = await api.get("/pagos", { params: { reservaId } });
-    return data;
+    const { data } = await api.get('/pagos', { params: { reservaId } })
+    return data
   },
-};
+}

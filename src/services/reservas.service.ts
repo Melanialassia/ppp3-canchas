@@ -1,5 +1,5 @@
 import api from "./api";
-import type { Reserva } from "../types/api";
+import type { Reserva } from '@/types'
 
 export const ReservasService = {
   async obtenerTodas(params: Record<string, string> = {}): Promise<Reserva[]> {
@@ -38,17 +38,5 @@ export const ReservasService = {
 
   async cancelar(id: number, razon = ""): Promise<Reserva> {
     return this.actualizarEstado(id, "cancelada", { razonCancelacion: razon });
-  },
-
-  async completar(id: number): Promise<Reserva> {
-    return this.actualizarEstado(id, "completada");
-  },
-
-  async marcarNoShow(id: number): Promise<Reserva> {
-    return this.actualizarEstado(id, "no_show");
-  },
-
-  async eliminar(id: number): Promise<void> {
-    await api.delete(`/reservas/${id}`);
   },
 };

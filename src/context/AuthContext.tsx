@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, type ReactNode } from 'react'
-import type { Sesion } from '../types/auth'
+import type { Sesion } from '@/types'
 
 interface AuthContextValue {
   sesion: Sesion | null
