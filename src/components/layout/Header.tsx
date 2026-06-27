@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/context";
+import { Modal } from "@/components/atoms";
 import { LuAlignJustify, LuCalendar, LuLogOut, LuUserRound, LuChartBarIncreasing, LuMenu, LuX } from "react-icons/lu";
 
 function NavLink({
@@ -35,16 +36,16 @@ export function Header() {
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [logoutModal, setLogoutModal] = useState(false);
 
   useEffect(() => {
     setMobileOpen(false);
   }, [pathname]);
 
-  function handleLogout() {
-    if (confirm("¿Estás seguro que deseás cerrar sesión?")) {
-      logout();
-      navigate("/");
-    }
+  function confirmarLogout() {
+    navigate("/", { replace: true });
+    logout();
+    setLogoutModal(false);
   }
 
   const isActive = (p: string) => pathname === p;
@@ -98,7 +99,7 @@ export function Header() {
         </span>
       </div>
       <button
-        onClick={handleLogout}
+        onClick={() => setLogoutModal(true)}
         className="flex items-center gap-1.5 bg-red-500/20 border border-red-400/30 text-red-300 px-3 py-1.5 rounded-xl text-[13px] font-semibold hover:bg-red-500/30 hover:text-red-200 transition-all cursor-pointer font-[inherit]"
       >
         <LuLogOut size={14} /> Salir
@@ -114,6 +115,7 @@ export function Header() {
   );
 
   return (
+    <>
     <header
       className="sticky top-0 z-50"
       style={{
@@ -184,10 +186,7 @@ export function Header() {
           {navLinks}
           <div className="border-t border-white/10 mt-2 pt-3">
             <button
-              onClick={() => {
-                handleLogout();
-                setMobileOpen(false);
-              }}
+              onClick={() => { setMobileOpen(false); setLogoutModal(true); }}
               className="flex w-full items-center gap-2 bg-red-500/20 border border-red-400/30 text-red-300 px-3 py-2.5 rounded-xl text-[13px] font-semibold cursor-pointer font-[inherit]"
             >
               <LuLogOut size={15} /> Cerrar Sesión ({sesion.nombre})
@@ -196,5 +195,27 @@ export function Header() {
         </div>
       )}
     </header>
+
+    {logoutModal && (
+      <Modal
+        titulo="Cerrar sesión"
+        onClose={() => setLogoutModal(false)}
+        footer={
+          <div className="flex gap-2">
+            <button className="btn btn-outline" onClick={() => setLogoutModal(false)}>
+              Cancelar
+            </button>
+            <button className="btn btn-danger" onClick={confirmarLogout}>
+              <LuLogOut size={14} /> Cerrar sesión
+            </button>
+          </div>
+        }
+      >
+        <p className="text-[14px] text-slate-600">
+          ¿Estás seguro que deseás cerrar la sesión?
+        </p>
+      </Modal>
+    )}
+    </>
   );
 }

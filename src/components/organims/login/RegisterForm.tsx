@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '@/context'
 import { AuthService } from '@/services'
-import { LuArrowRight } from "react-icons/lu";
+import { LuArrowRight, LuEye, LuEyeOff } from "react-icons/lu";
 import { FieldError, inputCls } from '@/components/atoms'
 
 interface RegisterFormProps {
@@ -21,6 +21,8 @@ export function RegisterForm({ mostrar }: RegisterFormProps) {
   const [cargando, setCargando] = useState(false)
   const [form, setForm] = useState({ nombre: '', apellido: '', email: '', telefono: '', password: '', passwordConfirm: '' })
   const [errs, setErrs] = useState<RegErrors>(R0)
+  const [showPassword, setShowPassword] = useState(false)
+  const [showPasswordConfirm, setShowPasswordConfirm] = useState(false)
 
   const set = <K extends keyof typeof form>(k: K, v: string) => {
     setForm((f) => ({ ...f, [k]: v }))
@@ -82,12 +84,22 @@ export function RegisterForm({ mostrar }: RegisterFormProps) {
       </div>
       <div className="mb-5">
         <label htmlFor="reg-password" className="block mb-1.5 text-[13px] font-semibold text-slate-800 tracking-[0.01em]">Contraseña <span className="text-red-500">*</span></label>
-        <input id="reg-password" type="password" className={inputCls(errs.password)} placeholder="Mínimo 6 caracteres" value={form.password} onChange={(e) => set('password', e.target.value)} />
+        <div className="relative">
+          <input id="reg-password" type={showPassword ? 'text' : 'password'} className={`${inputCls(errs.password)} pr-10`} placeholder="Mínimo 6 caracteres" value={form.password} onChange={(e) => set('password', e.target.value)} />
+          <button type="button" tabIndex={-1} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors" onClick={() => setShowPassword(v => !v)}>
+            {showPassword ? <LuEyeOff size={16} /> : <LuEye size={16} />}
+          </button>
+        </div>
         <FieldError msg={errs.password} />
       </div>
       <div className="mb-5">
         <label htmlFor="reg-password-confirm" className="block mb-1.5 text-[13px] font-semibold text-slate-800 tracking-[0.01em]">Confirmar Contraseña <span className="text-red-500">*</span></label>
-        <input id="reg-password-confirm" type="password" className={inputCls(errs.passwordConfirm)} placeholder="Repetí tu contraseña" value={form.passwordConfirm} onChange={(e) => set('passwordConfirm', e.target.value)} />
+        <div className="relative">
+          <input id="reg-password-confirm" type={showPasswordConfirm ? 'text' : 'password'} className={`${inputCls(errs.passwordConfirm)} pr-10`} placeholder="Repetí tu contraseña" value={form.passwordConfirm} onChange={(e) => set('passwordConfirm', e.target.value)} />
+          <button type="button" tabIndex={-1} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors" onClick={() => setShowPasswordConfirm(v => !v)}>
+            {showPasswordConfirm ? <LuEyeOff size={16} /> : <LuEye size={16} />}
+          </button>
+        </div>
         <FieldError msg={errs.passwordConfirm} />
       </div>
       <button

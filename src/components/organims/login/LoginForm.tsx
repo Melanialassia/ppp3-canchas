@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '@/context'
 import { AuthService } from '@/services'
-import { LuArrowRight } from "react-icons/lu";
+import { LuArrowRight, LuEye, LuEyeOff } from "react-icons/lu";
 import { FieldError, inputCls } from '@/components/atoms'
 
 interface LoginFormProps {
@@ -18,6 +18,7 @@ export function LoginForm({ mostrar }: LoginFormProps) {
   const [cargando, setCargando] = useState(false)
   const [form, setForm] = useState({ email: '', password: '' })
   const [errs, setErrs] = useState<LoginErrors>(L0)
+  const [showPassword, setShowPassword] = useState(false)
 
   const set = <K extends keyof typeof form>(k: K, v: string) => {
     setForm((f) => ({ ...f, [k]: v }))
@@ -60,14 +61,24 @@ export function LoginForm({ mostrar }: LoginFormProps) {
       </div>
       <div className="mb-5">
         <label htmlFor="login-password" className="block mb-1.5 text-[13px] font-semibold text-slate-800 tracking-[0.01em]">Contraseña</label>
-        <input
-          id="login-password"
-          type="password"
-          className={inputCls(errs.password)}
-          placeholder="••••••••"
-          value={form.password}
-          onChange={(e) => set('password', e.target.value)}
-        />
+        <div className="relative">
+          <input
+            id="login-password"
+            type={showPassword ? 'text' : 'password'}
+            className={`${inputCls(errs.password)} pr-10`}
+            placeholder="••••••••"
+            value={form.password}
+            onChange={(e) => set('password', e.target.value)}
+          />
+          <button
+            type="button"
+            tabIndex={-1}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
+            onClick={() => setShowPassword(v => !v)}
+          >
+            {showPassword ? <LuEyeOff size={16} /> : <LuEye size={16} />}
+          </button>
+        </div>
         <FieldError msg={errs.password} />
       </div>
       <button
@@ -76,13 +87,7 @@ export function LoginForm({ mostrar }: LoginFormProps) {
         disabled={cargando}
       >
         {cargando ? 'Iniciando sesión…' : <> Iniciar Sesión <LuArrowRight size={16} /></>}
-      </button>
-      <button
-        type="button"
-        className="text-center text-brand-600 text-[13px] font-medium mt-3 hover:text-brand-800 transition-colors bg-transparent border-none cursor-pointer font-[inherit]"
-      >
-        ¿Olvidaste tu contraseña?
-      </button>
+      </button>     
     </form>
   )
 }
