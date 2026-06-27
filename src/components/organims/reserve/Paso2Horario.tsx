@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { CanchasService, ReservasService } from "@/services";
 import { DateUtils, HorarioUtils, MoneyUtils } from "@/utils";
 import { Spinner } from "@/components";
-import { PASO2_PASO2_EMPTY } from "@/mock";
+import { PASO2_EMPTY } from "@/mock";
 import type { Cancha, Reserva } from "@/types";
 import type { DatosReserva } from "./ReservarPage";
 
