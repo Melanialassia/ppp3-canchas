@@ -16,7 +16,7 @@ export const Table = ({ reservas }: { reservas: Reserva[] }) => {
           </tr>
         </thead>
         <tbody>
-          {reservas.map(r => (
+          {reservas?.map(r => (
             <tr key={r.id} className="hover:bg-brand-50/50 transition-colors">
               <td className="px-4 py-3.5 border-b border-slate-100/80 text-slate-700 align-middle font-mono text-[13px] font-semibold">
                 {DateUtils.formatearHora(r.horaInicio)} – {DateUtils.formatearHora(r.horaFin)}
