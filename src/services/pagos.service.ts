@@ -1,9 +1,14 @@
 import api from './api'
-import type { MetodoPago, TipoPago } from '@/types'
+import type { MetodoPago, TipoPago, Pago } from '@/types'
 
 export type { MetodoPago, TipoPago }
 
 export const PagosService = {
+  async obtenerTodos(params: { tipoPago?: string; metodoPago?: string; limite?: number } = {}): Promise<Pago[]> {
+    const { data } = await api.get('/pagos', { params })
+    return data.data ?? data
+  },
+
   async registrar(
     reservaId: number,
     monto: number,
@@ -22,5 +27,14 @@ export const PagosService = {
   async obtenerPorReserva(reservaId: number) {
     const { data } = await api.get('/pagos', { params: { reservaId } })
     return data
+  },
+
+  async obtenerEstadisticas(): Promise<{
+    mes: string
+    totalMes: number
+    porMetodo: { cantidad: string; total: string; metodoPago: string }[]
+  }> {
+    const { data } = await api.get('/pagos/estadisticas')
+    return data.data ?? data
   },
 }

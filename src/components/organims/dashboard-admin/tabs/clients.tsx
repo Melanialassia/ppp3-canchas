@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useClientes, useDebounce } from "@/hooks";
-import { Spinner } from "@/components";
 import { ClientsTable } from "@/components/organims/tables";
 
 export function ClientesTab() {
@@ -23,9 +22,8 @@ export function ClientesTab() {
           onChange={(e) => setBusqueda(e.target.value)}
         />
       </div>
-      {loading && <Spinner />}
       {error && (
-        <div className="px-4 py-3.5 rounded-xl flex items-start gap-3 text-[13.5px] border bg-red-50 text-red-800 border-red-200">
+        <div className="px-4 py-3.5 rounded-xl flex items-start gap-3 text-[13.5px] border bg-red-50 text-red-800 border-red-200 mb-4">
           {error}
         </div>
       )}

@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import type { Cancha } from "@/types";
 import { MoneyUtils } from "@/utils";
 import { BadgeCancha } from "@/components/atoms";
+import { CAPACITY_LABEL, CAPACITY_COLOR } from "@/mock";
 import { LuUsers, LuDollarSign, LuPencil, LuArrowRight } from "react-icons/lu";
 
 interface Props {
@@ -10,18 +11,6 @@ interface Props {
   onCambiarEstado?: (cancha: Cancha) => void;
   onEditar?: (cancha: Cancha) => void;
 }
-
-const CAPACITY_LABEL: Record<number, string> = {
-  22: "Fútbol 11",
-  14: "Fútbol 7",
-  10: "Fútbol 5",
-};
-
-const CAPACITY_COLOR: Record<number, string> = {
-  22: "from-emerald-900 to-emerald-700",
-  14: "from-teal-900 to-teal-700",
-  10: "from-cyan-900 to-cyan-700",
-};
 
 export function CanchaCard({
   cancha,

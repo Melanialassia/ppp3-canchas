@@ -4,6 +4,7 @@ import { useAuth } from '@/context'
 import { AuthService } from '@/services'
 import { LuArrowRight, LuEye, LuEyeOff } from "react-icons/lu";
 import { FieldError, inputCls } from '@/components/atoms'
+import { REGISTER_INITIAL } from '@/mock'
 
 interface RegisterFormProps {
   mostrar: (msg: string, tipo: 'success' | 'error' | 'warning' | 'info') => void
@@ -13,14 +14,13 @@ type RegErrors = {
   nombre: string; apellido: string; email: string
   telefono: string; password: string; passwordConfirm: string
 }
-const R0: RegErrors = { nombre: '', apellido: '', email: '', telefono: '', password: '', passwordConfirm: '' }
 
 export function RegisterForm({ mostrar }: RegisterFormProps) {
   const { login } = useAuth()
   const navigate = useNavigate()
   const [cargando, setCargando] = useState(false)
-  const [form, setForm] = useState({ nombre: '', apellido: '', email: '', telefono: '', password: '', passwordConfirm: '' })
-  const [errs, setErrs] = useState<RegErrors>(R0)
+  const [form, setForm] = useState(REGISTER_INITIAL)
+  const [errs, setErrs] = useState<RegErrors>(REGISTER_INITIAL)
   const [showPassword, setShowPassword] = useState(false)
   const [showPasswordConfirm, setShowPasswordConfirm] = useState(false)
 
@@ -32,7 +32,7 @@ export function RegisterForm({ mostrar }: RegisterFormProps) {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     const { nombre, apellido, email, telefono, password, passwordConfirm } = form
-    const next = { ...R0 }
+    const next = { ...REGISTER_INITIAL }
     if (!nombre) next.nombre = 'El nombre es requerido'
     if (!apellido) next.apellido = 'El apellido es requerido'
     if (!email) next.email = 'El email es requerido'

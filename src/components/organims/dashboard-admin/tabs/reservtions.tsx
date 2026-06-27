@@ -2,7 +2,8 @@ import { useState } from 'react'
 import { useReservas } from '@/hooks'
 import { ReservasService, PagosService } from '@/services'
 import type { MetodoPago, Reserva } from '@/types'
-import { Spinner, Modal, useAlert } from '@/components'
+import { Modal, useAlert } from '@/components'
+import { Select, SelectItem } from '@/components/atoms'
 import { MoneyUtils } from '@/utils'
 import { AdminReservationsTable, type AccionItem } from '@/components/organims/tables'
 
@@ -131,20 +132,19 @@ export function ReservasTab() {
         </div>
         <div style={{ margin: 0 }}>
           <label className="block mb-1.5 text-[13px] font-semibold text-slate-800 tracking-[0.01em]">Estado</label>
-          <select className="form-select" value={filtroEstado} onChange={e => setFiltroEstado(e.target.value)}>
-            <option value="">Todos</option>
-            <option value="pendiente">Pendiente</option>
-            <option value="confirmada">Confirmada</option>
-            <option value="completada">Completada</option>
-            <option value="cancelada">Cancelada</option>
-            <option value="no_show">No Show</option>
-          </select>
+          <Select value={filtroEstado} onValueChange={setFiltroEstado} placeholder="Todos">
+            <SelectItem value="">Todos</SelectItem>
+            <SelectItem value="pendiente">Pendiente</SelectItem>
+            <SelectItem value="confirmada">Confirmada</SelectItem>
+            <SelectItem value="completada">Completada</SelectItem>
+            <SelectItem value="cancelada">Cancelada</SelectItem>
+            <SelectItem value="no_show">No Show</SelectItem>
+          </Select>
         </div>
       </div>
 
-      {loading && <Spinner />}
       {error && (
-        <div className="px-4 py-3.5 rounded-xl flex items-start gap-3 text-[13.5px] border bg-red-50 text-red-800 border-red-200">
+        <div className="px-4 py-3.5 rounded-xl flex items-start gap-3 text-[13.5px] border bg-red-50 text-red-800 border-red-200 mb-4">
           {error}
         </div>
       )}
@@ -172,7 +172,7 @@ export function ReservasTab() {
                 onClick={() => accion(confirmModal.id, confirmModal.estado)}
                 disabled={ejecutando}
               >
-                {ejecutando ? '...' : 'Aceptar'}
+                {ejecutando ? 'Guardando' : 'Aceptar'}
               </button>
             </div>
           }
@@ -189,7 +189,7 @@ export function ReservasTab() {
             <div className="flex gap-2 justify-end">
               <button className="btn btn-outline" onClick={() => setModalPago(null)}>Cancelar</button>
               <button className="btn btn-primary" onClick={confirmarPago} disabled={procesando}>
-                {procesando ? '...' : 'Confirmar Pago'}
+                {procesando ? 'Guardando' : 'Confirmar Pago'}
               </button>
             </div>
           }
@@ -217,11 +217,11 @@ export function ReservasTab() {
           </div>
           <div className="mb-5">
             <label className="block mb-1.5 text-[13px] font-semibold text-slate-800 tracking-[0.01em]">Método de pago</label>
-            <select className="form-select" value={metodoPago} onChange={e => setMetodoPago(e.target.value)}>
-              <option value="efectivo">Efectivo</option>
-              <option value="tarjeta">Tarjeta</option>
-              <option value="transferencia">Transferencia</option>
-            </select>
+            <Select value={metodoPago} onValueChange={setMetodoPago}>
+              <SelectItem value="efectivo">Efectivo</SelectItem>
+              <SelectItem value="tarjeta">Tarjeta</SelectItem>
+              <SelectItem value="transferencia">Transferencia</SelectItem>
+            </Select>
           </div>
         </Modal>
       )}

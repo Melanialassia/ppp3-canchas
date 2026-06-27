@@ -19,7 +19,7 @@ export class ErrorBoundary extends Component<Props, State> {
     if (this.state.error) {
       return (
         this.props.fallback ?? (
-          <div className="flex flex-col items-center justify-center min-h-screen gap-4 text-center px-6">
+          <div className="flex flex-col items-center justify-center min-h-screen gap-4 text-center px-6 an">
             <div className="text-5xl">⚽</div>
             <h2 className="text-xl font-bold text-slate-800">Algo salió mal</h2>
             <p className="text-slate-500 text-sm max-w-sm">{this.state.error.message}</p>

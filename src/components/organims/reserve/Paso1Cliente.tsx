@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useAuth } from "@/context";
 import { ClientesService } from "@/services";
 import { FieldError, inputCls } from "@/components/atoms";
+import { PASO1_PASO1_EMPTY } from "@/mock";
 import type { DatosCliente } from "./ReservarPage";
 
 interface Props {
@@ -9,7 +10,6 @@ interface Props {
 }
 
 type Errors = { telefono: string; nombre: string; apellido: string };
-const EMPTY: Errors = { telefono: "", nombre: "", apellido: "" };
 
 export function Paso1Cliente({ onNext }: Props) {
   const { sesion } = useAuth();
@@ -21,7 +21,7 @@ export function Paso1Cliente({ onNext }: Props) {
   const [readonly, setReadonly] = useState(false);
   const [datosVisibles, setDatosVisibles] = useState(false);
   const [buscando, setBuscando] = useState(false);
-  const [errors, setErrors] = useState<Errors>(EMPTY);
+  const [errors, setErrors] = useState<Errors>(PASO1_EMPTY);
 
   useEffect(() => {
     if (sesion?.clienteId) {
@@ -36,7 +36,7 @@ export function Paso1Cliente({ onNext }: Props) {
   }, [sesion]);
 
   async function buscarCliente() {
-    const errs = { ...EMPTY };
+    const errs = { ...PASO1_EMPTY };
     if (!telefono.trim()) errs.telefono = "Ingresá un número de teléfono";
     else if (!/^\d{8,15}$/.test(telefono))
       errs.telefono = "Solo dígitos, 8 a 15 caracteres";
@@ -69,7 +69,7 @@ export function Paso1Cliente({ onNext }: Props) {
   }
 
   function siguiente() {
-    const errs = { ...EMPTY };
+    const errs = { ...PASO1_EMPTY };
     if (!telefono) errs.telefono = "El teléfono es requerido";
     else if (!/^\d{8,15}$/.test(telefono))
       errs.telefono = "Solo dígitos, 8 a 15 caracteres";

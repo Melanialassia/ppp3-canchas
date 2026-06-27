@@ -31,4 +31,19 @@ export const ClientesService = {
     const { data } = await api.patch(`/clientes/${id}`, { estado });
     return data;
   },
+
+  async obtenerEstadisticas(): Promise<{
+    total: number
+    activos: number
+    suspendidos: number
+    bloqueados: number
+  }> {
+    const todos = await ClientesService.obtenerTodos({ limite: '1000' })
+    return {
+      total: todos.length,
+      activos: todos.filter(c => c.estado === 'activo').length,
+      suspendidos: todos.filter(c => c.estado === 'suspendido').length,
+      bloqueados: todos.filter(c => c.estado === 'bloqueado').length,
+    }
+  },
 };

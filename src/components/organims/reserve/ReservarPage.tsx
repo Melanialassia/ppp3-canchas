@@ -3,6 +3,7 @@ import { PublicLayout } from "@/components";
 import { Paso1Cliente } from "./Paso1Cliente";
 import { Paso2Horario } from "./Paso2Horario";
 import { Paso3Resumen } from "./Paso3Resumen";
+import { PASOS } from "@/mock";
 import type { Cancha } from "@/types";
 
 export interface DatosCliente {
@@ -22,12 +23,6 @@ export interface DatosReserva {
   horaFin: string;
   observaciones: string;
 }
-
-const PASOS = [
-  { n: 1, label: "Datos" },
-  { n: 2, label: "Horario" },
-  { n: 3, label: "Confirmar" },
-];
 
 export function ReservarPage() {
   const [paso, setPaso] = useState<1 | 2 | 3>(1);

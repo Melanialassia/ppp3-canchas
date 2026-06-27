@@ -57,3 +57,13 @@ export interface ApiError {
 
 export type MetodoPago = 'efectivo' | 'tarjeta' | 'transferencia'
 export type TipoPago   = 'seña' | 'saldo' | 'completo' | 'devolucion'
+
+export interface Pago {
+  id: number
+  reservaId: number
+  monto: number
+  tipoPago: TipoPago
+  metodoPago: MetodoPago
+  fechaPago: string
+  observaciones?: string
+}

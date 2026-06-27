@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
-import { Spinner, useAlert } from "@/components/atoms";
+import { useAlert } from "@/components/atoms";
 import { useAuth } from "@/context";
 import { useReservas } from "@/hooks";
 import { ReservasService } from "@/services";
@@ -59,9 +59,8 @@ export function ReservartionsPage() {
             <span className="sm:hidden">+ Nueva</span>
           </Link>
         </div>
-        {loading && <Spinner />}
         {error && (
-          <div className="px-4 py-3.5 rounded-xl flex items-start gap-3 text-[13.5px] border bg-red-50 text-red-800 border-red-200">
+          <div className="px-4 py-3.5 rounded-xl flex items-start gap-3 text-[13.5px] border bg-red-50 text-red-800 border-red-200 mb-4">
             {error}
           </div>
         )}

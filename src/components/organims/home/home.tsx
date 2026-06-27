@@ -1,61 +1,8 @@
 import { useNavigate } from "react-router-dom";
 import { PublicLayout, CanchaCard, EmptyState, Spinner } from "@/components";
-import {
-  LuCalendar,
-  LuZap,
-  LuDollarSign,
-  LuStar,
-  LuShieldCheck,
-  LuArrowRight,
-} from "react-icons/lu";
+import { LuShieldCheck, LuArrowRight } from "react-icons/lu";
 import { useCanchas } from "@/hooks";
-import { CARDS } from "@/mock";
-
-const FEATURES = [
-  {
-    Icon: LuCalendar,
-    color: "bg-emerald-50 text-emerald-700 ring-emerald-200",
-    title: "Reserva Online",
-    desc: "Reservá desde cualquier lugar, las 24 horas. Sin necesidad de llamar.",
-  },
-  {
-    Icon: LuZap,
-    color: "bg-amber-50 text-amber-600 ring-amber-200",
-    title: "Confirmación Inmediata",
-    desc: "Obtené confirmación instantánea. Sin esperas ni confusiones.",
-  },
-  {
-    Icon: LuDollarSign,
-    color: "bg-sky-50 text-sky-700 ring-sky-200",
-    title: "Descuentos por Frecuencia",
-    desc: "Clientes frecuentes obtienen descuentos especiales de forma automática.",
-  },
-  {
-    Icon: LuStar,
-    color: "bg-purple-50 text-purple-700 ring-purple-200",
-    title: "Canchas de Calidad",
-    desc: "Césped sintético de última generación, perfectamente mantenido.",
-  },
-];
-
-const STEPS = [
-  {
-    title: "Elegí tu Cancha",
-    desc: "Seleccioná la cancha que mejor se adapte a tus necesidades",
-  },
-  {
-    title: "Seleccioná Fecha y Horario",
-    desc: "Verificá la disponibilidad y elegí el horario que prefieras",
-  },
-  {
-    title: "Completá tus Datos",
-    desc: "Ingresá tu información de contacto en segundos",
-  },
-  {
-    title: "Confirmá y Jugá",
-    desc: "Recibí tu confirmación y disfrutá del partido",
-  },
-];
+import { CARDS, FEATURES, STEPS } from "@/mock";
 
 export function HomePage() {
   const { canchas, loading, error } = useCanchas();

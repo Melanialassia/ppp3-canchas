@@ -1,31 +1,19 @@
 import { useState } from "react";
 import { AdminLayout } from '@/components'
-import { LuChartBarIncreasing, LuCalendar, LuUsers, LuLayoutGrid } from "react-icons/lu";
 import { DashboardTab } from "./tabs/dashboard";
 import { ReservasTab } from "./tabs/reservtions";
 import { ClientesTab } from "./tabs/clients";
 import { CanchasTab } from "./tabs/courts";
-
-type Tab = "dashboard" | "reservas" | "clientes" | "canchas";
-
-const TABS: {
-  id: Tab;
-  label: string;
-  Icon: React.ComponentType<{ size?: number; className?: string }>;
-}[] = [
-  { id: "dashboard", label: "Dashboard", Icon: LuChartBarIncreasing },
-  { id: "reservas", label: "Reservas", Icon: LuCalendar },
-  { id: "clientes", label: "Clientes", Icon: LuUsers },
-  { id: "canchas", label: "Canchas", Icon: LuLayoutGrid },
-];
+import { PagosTab } from "./tabs/pagos";
+import { ADMIN_TABS, type TabAdmin } from "@/mock";
 
 export function AdminPage() {
-  const [tab, setTab] = useState<Tab>("dashboard");
+  const [tab, setTab] = useState<TabAdmin>("dashboard");
 
   return (
     <AdminLayout>
         <div className="md:hidden flex border-b border-slate-200 bg-white overflow-x-auto shrink-0">
-          {TABS.map(({ id, label, Icon }) => {
+          {ADMIN_TABS?.map(({ id, label, Icon }) => {
             const active = tab === id;
             return (
               <button
@@ -50,7 +38,7 @@ export function AdminPage() {
             </p>
           </div>
           <nav className="flex flex-col gap-1 p-3 flex-1">
-            {TABS?.map(({ id, label, Icon }) => {
+            {ADMIN_TABS?.map(({ id, label, Icon }) => {
               const active = tab === id;
               return (
                 <button
@@ -85,6 +73,7 @@ export function AdminPage() {
             {tab === "reservas" && <ReservasTab />}
             {tab === "clientes" && <ClientesTab />}
             {tab === "canchas" && <CanchasTab />}
+            {tab === "pagos" && <PagosTab />}
           </div>
         </main>
     </AdminLayout>

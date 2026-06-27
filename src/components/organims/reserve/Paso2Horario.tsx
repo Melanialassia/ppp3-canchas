@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { CanchasService, ReservasService } from "@/services";
 import { DateUtils, HorarioUtils, MoneyUtils } from "@/utils";
 import { Spinner } from "@/components";
+import { PASO2_PASO2_EMPTY } from "@/mock";
 import type { Cancha, Reserva } from "@/types";
 import type { DatosReserva } from "./ReservarPage";
 
@@ -16,7 +17,6 @@ type Errors = {
   horaInicio: string;
   horaFin: string;
 };
-const EMPTY: Errors = { cancha: "", fecha: "", horaInicio: "", horaFin: "" };
 
 function FieldError({ msg }: { msg: string }) {
   if (!msg) return null;
@@ -34,7 +34,7 @@ export function Paso2Horario({ onNext, onBack }: Props) {
   const [horaFin, setHoraFin] = useState("");
   const [reservasOcupadas, setReservasOcupadas] = useState<Reserva[]>([]);
   const [cargandoDisp, setCargandoDisp] = useState(false);
-  const [errors, setErrors] = useState<Errors>(EMPTY);
+  const [errors, setErrors] = useState<Errors>(PASO2_EMPTY);
 
   useEffect(() => {
     CanchasService.obtenerTodas()
@@ -51,7 +51,7 @@ export function Paso2Horario({ onNext, onBack }: Props) {
       .finally(() => setCargandoDisp(false));
     setHoraInicio("");
     setHoraFin("");
-    setErrors(EMPTY);
+    setErrors(PASO2_EMPTY);
   }, [fecha, canchaId]);
 
   function estaOcupado(hora: string) {
@@ -72,7 +72,7 @@ export function Paso2Horario({ onNext, onBack }: Props) {
   }
 
   function siguiente() {
-    const errs = { ...EMPTY };
+    const errs = { ...PASO2_EMPTY };
     if (!canchaId) errs.cancha = "Seleccioná una cancha";
     if (!fecha) errs.fecha = "La fecha es requerida";
     if (!horaInicio) errs.horaInicio = "Seleccioná un horario de inicio";

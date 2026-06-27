@@ -4,20 +4,20 @@ import { useAuth } from '@/context'
 import { AuthService } from '@/services'
 import { LuArrowRight, LuEye, LuEyeOff } from "react-icons/lu";
 import { FieldError, inputCls } from '@/components/atoms'
+import { LOGIN_INITIAL } from '@/mock'
 
 interface LoginFormProps {
   mostrar: (msg: string, tipo: 'success' | 'error' | 'warning' | 'info') => void
 }
 
 type LoginErrors = { email: string; password: string }
-const L0: LoginErrors = { email: '', password: '' }
 
 export function LoginForm({ mostrar }: LoginFormProps) {
   const { login } = useAuth()
   const navigate = useNavigate()
   const [cargando, setCargando] = useState(false)
-  const [form, setForm] = useState({ email: '', password: '' })
-  const [errs, setErrs] = useState<LoginErrors>(L0)
+  const [form, setForm] = useState(LOGIN_INITIAL)
+  const [errs, setErrs] = useState<LoginErrors>(LOGIN_INITIAL)
   const [showPassword, setShowPassword] = useState(false)
 
   const set = <K extends keyof typeof form>(k: K, v: string) => {
@@ -27,7 +27,7 @@ export function LoginForm({ mostrar }: LoginFormProps) {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    const next = { ...L0 }
+    const next = { ...LOGIN_INITIAL }
     if (!form.email) next.email = 'El email es requerido'
     if (!form.password) next.password = 'La contraseña es requerida'
     if (next.email || next.password) { setErrs(next); return }
