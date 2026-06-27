@@ -10,7 +10,7 @@ api.interceptors.request.use((config) => {
     try {
       const sesion = JSON.parse(raw);
       if (sesion?.token)
-        console.log("TPKE",sesion?.token)
+
         config.headers.Authorization = `Bearer ${sesion.token}`;
     } catch {}
   }
