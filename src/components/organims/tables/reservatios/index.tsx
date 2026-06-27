@@ -11,7 +11,7 @@ export const ReservationsTable = ({
   canceled,
 }: {
   reservas: Reserva[];
-  canceled: number;
+  canceled: number | null;
   handleSubmit: (id: number) => Promise<void>;
   loading: boolean;
   error: string;

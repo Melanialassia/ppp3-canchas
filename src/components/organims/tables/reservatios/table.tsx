@@ -8,7 +8,7 @@ export const Table = ({
   handleSubmit,
 }: {
   reservas: Reserva[];
-  canceled: number;
+  canceled: number | null;
   handleSubmit: (id: number) => Promise<void>;
 }) => {
   const header_tabs = [

@@ -29,7 +29,7 @@ export function ClientesTab() {
           {error}
         </div>
       )}
-      <ClientsTable clientes={clientes} loading={loading} error={error} />
+      <ClientsTable clientes={clientes} loading={loading} error={error ?? ''} />
     </div>
   );
 }

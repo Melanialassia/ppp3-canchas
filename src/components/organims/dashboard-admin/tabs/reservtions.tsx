@@ -21,12 +21,10 @@ export function ReservasTab() {
   if (filtroFecha) params.fecha = filtroFecha
   if (filtroEstado) params.estado = filtroEstado
   const { reservas, loading, error, recargar } = useReservas(params)
-
   const [modalPago, setModalPago] = useState<Reserva | null>(null)
   const [montoPago, setMontoPago] = useState('')
   const [metodoPago, setMetodoPago] = useState('efectivo')
   const [procesando, setProcesando] = useState(false)
-
   const [confirmModal, setConfirmModal] = useState<ConfirmModal | null>(null)
   const [ejecutando, setEjecutando] = useState(false)
 
@@ -154,7 +152,7 @@ export function ReservasTab() {
       <AdminReservationsTable
         reservas={reservasOrdenadas}
         loading={loading}
-        error={error}
+        error={error ?? ''}
         ordenFecha={ordenFecha}
         onOrdenFecha={() => setOrdenFecha(v => v === 'desc' ? 'asc' : 'desc')}
         getAcciones={getAcciones}

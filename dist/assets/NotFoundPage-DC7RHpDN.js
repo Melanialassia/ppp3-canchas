@@ -1,1 +1,0 @@
-import{w as e}from"./index-COTgQzAq.js";import{t}from"./CardPage-DZihd9mA.js";var n=e();function r(){return(0,n.jsx)(t,{code:404,title:`¡Tarjeta amarilla!`,src:`/yellow-card.png`,description:`Esta página no existe o fue expulsada del sistema.`,accentClassName:`text-yellow-200`})}export{r as NotFoundPage};

@@ -2,7 +2,7 @@ import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { Spinner, useAlert } from "@/components/atoms";
 import { useAuth } from "@/context";
-import { useReservas, useCanchas } from "@/hooks";
+import { useReservas } from "@/hooks";
 import { ReservasService } from "@/services";
 import { ReservationsTable } from "@/components/organims/tables";
 import { PublicLayout } from "@/components/layouts";
@@ -11,10 +11,9 @@ export function ReservartionsPage() {
   const { sesion } = useAuth();
   const { mostrar, AlertComponent } = useAlert();
   const clienteId = sesion?.clienteId;
-  const { canchas } = useCanchas();
   const [canceled, setCanceled] = useState<number | null>(null);
   const params = useMemo(
-    () => (clienteId ? { clienteId: String(clienteId) } : {}),
+    () => (clienteId ? { clienteId: String(clienteId) } : undefined),
     [clienteId],
   );
   const { reservas, loading, error, recargar } = useReservas(params);
@@ -68,7 +67,7 @@ export function ReservartionsPage() {
         )}
         <ReservationsTable
           loading={loading}
-          error={error}
+          error={error ?? ''}
           reservas={reservas}
           handleSubmit={handleSubmit}
           canceled={canceled}
