@@ -8,10 +8,14 @@ export const ClientsTable = ({
   loading,
   error,
   clientes,
+  onEditar,
+  onEliminar,
 }: {
   clientes: Cliente[];
   loading: boolean;
   error: string;
+  onEditar: (cliente: Cliente) => void;
+  onEliminar: (cliente: Cliente) => void;
 }) => {
   if (loading) {
     return (
@@ -36,5 +40,9 @@ export const ClientsTable = ({
     return <EmptyState titulo="No se encontraron clientes" variant="inline" />;
   }
 
-  return !!clientes?.length && <Table clientes={clientes} />;
+  return (
+    !!clientes?.length && (
+      <Table clientes={clientes} onEditar={onEditar} onEliminar={onEliminar} />
+    )
+  );
 };

@@ -1,19 +1,21 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { ClientesService, ReservasService } from "@/services";
 import { DateUtils, MoneyUtils } from "@/utils";
 import { useAlert } from "@/components";
+import { useAuth } from "@/context";
+import type { Reserva } from "@/types";
 import type { DatosCliente, DatosReserva } from "./ReservarPage";
 
 interface Props {
   cliente: DatosCliente;
   reserva: DatosReserva;
   onBack: () => void;
+  onCreated: (reserva: Reserva) => void;
 }
 
-export function Paso3Resumen({ cliente, reserva, onBack }: Props) {
-  const navigate = useNavigate();
+export function Paso3Resumen({ cliente, reserva, onBack, onCreated }: Props) {
   const { mostrar, AlertComponent } = useAlert();
+  const { sesion, login } = useAuth();
   const [observaciones, setObservaciones] = useState("");
   const [enviando, setEnviando] = useState(false);
 
@@ -36,8 +38,31 @@ export function Paso3Resumen({ cliente, reserva, onBack }: Props) {
           email: cliente.email || undefined,
         });
         clienteId = nuevo.id;
+      } else if (sesion?.rol === "cliente" && sesion.clienteId === clienteId) {
+        // El cliente logueado pudo editar sus datos en el Paso 1: persistir si cambió algo
+        // y refrescar la sesión para que el cambio quede guardado y se vea más adelante.
+        const cambiado =
+          sesion.nombre !== cliente.nombre ||
+          sesion.apellido !== cliente.apellido ||
+          sesion.telefono !== cliente.telefono ||
+          (sesion.email ?? "") !== cliente.email;
+        if (cambiado) {
+          await ClientesService.actualizar(clienteId, {
+            nombre: cliente.nombre,
+            apellido: cliente.apellido,
+            telefono: cliente.telefono,
+            email: cliente.email || undefined,
+          });
+          login({
+            ...sesion,
+            nombre: cliente.nombre,
+            apellido: cliente.apellido,
+            telefono: cliente.telefono,
+            email: cliente.email,
+          });
+        }
       }
-      await ReservasService.crear({
+      const creada = await ReservasService.crear({
         canchaId: reserva.canchaId,
         clienteId: clienteId!,
         fecha: reserva.fecha,
@@ -45,8 +70,8 @@ export function Paso3Resumen({ cliente, reserva, onBack }: Props) {
         horaFin: reserva.horaFin,
         observaciones: observaciones.trim() || undefined,
       });
-      mostrar("¡Reserva creada exitosamente!", "success");
-      setTimeout(() => navigate("/mis-reservas"), 1500);
+      mostrar("¡Reserva creada! Pagá la seña para confirmarla.", "success");
+      onCreated(creada);
     } catch (err) {
       mostrar(
         (err as Error).message ||
@@ -141,7 +166,7 @@ export function Paso3Resumen({ cliente, reserva, onBack }: Props) {
           onClick={confirmar}
           disabled={enviando}
         >
-          {enviando ? "Procesando…" : "✓ Confirmar Reserva"}
+          {enviando ? "Procesando…" : "Continuar al pago →"}
         </button>
       </div>
     </div>

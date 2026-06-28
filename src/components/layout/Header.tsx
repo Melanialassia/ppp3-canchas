@@ -2,7 +2,8 @@ import { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/context";
 import { Modal } from "@/components/atoms";
-import { LuAlignJustify, LuCalendar, LuLogOut, LuUserRound, LuChartBarIncreasing, LuMenu, LuX } from "react-icons/lu";
+import { EditarPerfilModal } from "./EditarPerfilModal";
+import { LuAlignJustify, LuCalendar, LuLogOut, LuUserRound, LuChartBarIncreasing, LuMenu, LuX, LuPencil } from "react-icons/lu";
 
 function NavLink({
   to,
@@ -37,6 +38,7 @@ export function Header() {
   const { pathname } = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [logoutModal, setLogoutModal] = useState(false);
+  const [perfilModal, setPerfilModal] = useState(false);
 
   useEffect(() => {
     setMobileOpen(false);
@@ -92,12 +94,26 @@ export function Header() {
 
   const sessionBlock = sesion ? (
     <div className="flex items-center gap-2 ml-3 pl-3 border-l border-white/15">
-      <div className="hidden lg:flex items-center gap-2 bg-white/10 border border-white/15 px-3 py-1.5 rounded-xl">
-        <LuUserRound size={14} className="text-emerald-300" />
-        <span className="text-white text-[13px] font-medium">
-          {sesion.nombre}
-        </span>
-      </div>
+      {isCliente ? (
+        <button
+          onClick={() => setPerfilModal(true)}
+          title="Editar mis datos"
+          className="hidden lg:flex items-center gap-2 bg-white/10 border border-white/15 px-3 py-1.5 rounded-xl hover:bg-white/20 transition-all cursor-pointer font-[inherit] group"
+        >
+          <LuUserRound size={14} className="text-emerald-300" />
+          <span className="text-white text-[13px] font-medium">
+            {sesion.nombre}
+          </span>
+          <LuPencil size={12} className="text-white/50 group-hover:text-white/80 transition-colors" />
+        </button>
+      ) : (
+        <div className="hidden lg:flex items-center gap-2 bg-white/10 border border-white/15 px-3 py-1.5 rounded-xl">
+          <LuUserRound size={14} className="text-emerald-300" />
+          <span className="text-white text-[13px] font-medium">
+            {sesion.nombre}
+          </span>
+        </div>
+      )}
       <button
         onClick={() => setLogoutModal(true)}
         className="flex items-center gap-1.5 bg-red-500/20 border border-red-400/30 text-red-300 px-3 py-1.5 rounded-xl text-[13px] font-semibold hover:bg-red-500/30 hover:text-red-200 transition-all cursor-pointer font-[inherit]"
@@ -184,7 +200,15 @@ export function Header() {
           }}
         >
           {navLinks}
-          <div className="border-t border-white/10 mt-2 pt-3">
+          <div className="border-t border-white/10 mt-2 pt-3 flex flex-col gap-2">
+            {isCliente && (
+              <button
+                onClick={() => { setMobileOpen(false); setPerfilModal(true); }}
+                className="flex w-full items-center gap-2 bg-white/10 border border-white/15 text-white px-3 py-2.5 rounded-xl text-[13px] font-semibold cursor-pointer font-[inherit]"
+              >
+                <LuPencil size={15} /> Editar mis datos
+              </button>
+            )}
             <button
               onClick={() => { setMobileOpen(false); setLogoutModal(true); }}
               className="flex w-full items-center gap-2 bg-red-500/20 border border-red-400/30 text-red-300 px-3 py-2.5 rounded-xl text-[13px] font-semibold cursor-pointer font-[inherit]"
@@ -216,6 +240,8 @@ export function Header() {
         </p>
       </Modal>
     )}
+
+    {perfilModal && <EditarPerfilModal onClose={() => setPerfilModal(false)} />}
     </>
   );
 }

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { ReservasService, ClientesService, PagosService } from "@/services";
-import { DateUtils, MoneyUtils } from "@/utils";
+import { ReservasService, ClientesService, CanchasService, PagosService } from "@/services";
+import { DateUtils, MoneyUtils, ReservaUtils } from "@/utils";
 import {
   LuCalendar,
   LuDollarSign,
@@ -45,14 +45,16 @@ export function DashboardTab() {
       setCargando(true);
       try {
         const hoy = DateUtils.fechaHoy();
-        const [rHoy, rTodas, clientesEst, pagosEst] = await Promise.all([
+        const [rHoy, rTodas, clientesEst, pagosEst, canchas, clientes] = await Promise.all([
           ReservasService.obtenerTodas({ fecha: hoy }),
           ReservasService.obtenerTodas(),
           ClientesService.obtenerEstadisticas(),
           PagosService.obtenerEstadisticas(),
+          CanchasService.obtenerTodas(),
+          ClientesService.obtenerTodos({ limite: "1000" }),
         ]);
 
-        setReservasHoy(rHoy);
+        setReservasHoy(ReservaUtils.enriquecer(rHoy, canchas, clientes));
         setPagosStats(pagosEst);
         setClientesStats(clientesEst);
 

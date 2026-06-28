@@ -1,6 +1,30 @@
-import type { Cliente } from "@/types";
+import type { Cliente, EstadoCliente } from "@/types";
+import { tipoClienteLabel } from "@/mock";
 
-export const Table = ({ clientes }: { clientes: Cliente[] }) => {
+const ESTADO_BADGE: Record<EstadoCliente, { dot: string; chip: string }> = {
+  activo: {
+    dot: "bg-emerald-500",
+    chip: "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200/60",
+  },
+  suspendido: {
+    dot: "bg-amber-500",
+    chip: "bg-amber-50 text-amber-700 ring-1 ring-amber-200/60",
+  },
+  bloqueado: {
+    dot: "bg-red-500",
+    chip: "bg-red-50 text-red-700 ring-1 ring-red-200/60",
+  },
+};
+
+export const Table = ({
+  clientes,
+  onEditar,
+  onEliminar,
+}: {
+  clientes: Cliente[];
+  onEditar: (cliente: Cliente) => void;
+  onEliminar: (cliente: Cliente) => void;
+}) => {
   const header_table = [
     "Nombre",
     "Teléfono",
@@ -9,6 +33,7 @@ export const Table = ({ clientes }: { clientes: Cliente[] }) => {
     "Reservas",
     "Descuento",
     "Estado",
+    "",
   ];
 
   return (
@@ -36,7 +61,7 @@ export const Table = ({ clientes }: { clientes: Cliente[] }) => {
                 {c.email ?? "—"}
               </td>
               <td className="px-4 py-3.5 border-b border-slate-100/80 text-slate-700 align-middle">
-                {c.tipoClienteId ?? "—"}
+                {tipoClienteLabel(c.tipoClienteId)}
               </td>
               <td className="px-4 py-3.5 border-b border-slate-100/80 text-slate-700 align-middle">
                 {c.totalReservas ?? 0}
@@ -45,14 +70,33 @@ export const Table = ({ clientes }: { clientes: Cliente[] }) => {
                 {c.descuentoPorcentaje ?? 0}%
               </td>
               <td className="px-4 py-3.5 border-b border-slate-100/80 text-slate-700 align-middle">
-                <span
-                  className={`inline-flex items-center gap-1.5 px-2.5 py-0.75 text-[11.5px] font-semibold rounded-full whitespace-nowrap ${c.estado === "activo" ? "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200/60" : "bg-red-50 text-red-700 ring-1 ring-red-200/60"}`}
-                >
-                  <span
-                    className={`size-1.25 rounded-full flex-shrink-0 ${c.estado === "activo" ? "bg-emerald-500" : "bg-red-500"}`}
-                  />
-                  {c.estado ?? "activo"}
-                </span>
+                {(() => {
+                  const badge = ESTADO_BADGE[c.estado ?? "activo"];
+                  return (
+                    <span
+                      className={`inline-flex items-center gap-1.5 px-2.5 py-0.75 text-[11.5px] font-semibold rounded-full whitespace-nowrap ${badge.chip}`}
+                    >
+                      <span className={`size-1.25 rounded-full flex-shrink-0 ${badge.dot}`} />
+                      {c.estado ?? "activo"}
+                    </span>
+                  );
+                })()}
+              </td>
+              <td className="px-4 py-3.5 border-b border-slate-100/80 text-slate-700 align-middle">
+                <div className="flex gap-2 justify-end">
+                  <button
+                    className="btn btn-small btn-outline border-brand-200 text-brand-700 hover:bg-brand-50 hover:border-brand-300"
+                    onClick={() => onEditar(c)}
+                  >
+                    Editar
+                  </button>
+                  <button
+                    className="btn btn-small btn-outline border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300"
+                    onClick={() => onEliminar(c)}
+                  >
+                    Eliminar
+                  </button>
+                </div>
               </td>
             </tr>
           ))}

@@ -32,6 +32,10 @@ export const ClientesService = {
     return data;
   },
 
+  async eliminar(id: number): Promise<void> {
+    await api.delete(`/clientes/${id}`);
+  },
+
   async obtenerEstadisticas(): Promise<{
     total: number
     activos: number

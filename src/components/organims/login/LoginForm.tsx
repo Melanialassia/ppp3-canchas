@@ -36,8 +36,8 @@ export function LoginForm({ mostrar }: LoginFormProps) {
     try {
       const s = await AuthService.login(form.email, form.password)
       login(s)
-      mostrar('¡Bienvenido! Redirigiendo…', 'success')
-      setTimeout(() => navigate(s.rol === 'admin' ? '/admin' : '/reservar'), 1200)
+      mostrar('¡Bienvenido!', 'success')
+      navigate(s.rol === 'admin' ? '/admin' : '/reservar')
     } catch (err) {
       mostrar((err as Error).message || 'Email o contraseña incorrectos', 'error')
     } finally {

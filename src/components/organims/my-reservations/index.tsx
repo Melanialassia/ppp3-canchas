@@ -1,25 +1,47 @@
 import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
-import { useAlert } from "@/components/atoms";
+import { useAlert, confirmar } from "@/components/atoms";
 import { useAuth } from "@/context";
-import { useReservas } from "@/hooks";
+import { useReservas, useSaldosReservas, useCanchas } from "@/hooks";
 import { ReservasService } from "@/services";
+import { ReservaUtils } from "@/utils";
 import { ReservationsTable } from "@/components/organims/tables";
 import { PublicLayout } from "@/components/layouts";
+import { ModalPagoReserva } from "./ModalPagoReserva";
+import type { Reserva } from "@/types";
 
 export function ReservartionsPage() {
   const { sesion } = useAuth();
   const { mostrar, AlertComponent } = useAlert();
   const clienteId = sesion?.clienteId;
   const [canceled, setCanceled] = useState<number | null>(null);
+  const [reservaPago, setReservaPago] = useState<Reserva | null>(null);
   const params = useMemo(
     () => (clienteId ? { clienteId: String(clienteId) } : undefined),
     [clienteId],
   );
   const { reservas, loading, error, recargar } = useReservas(params);
+  const { canchas } = useCanchas();
+  const reservasView = useMemo(
+    () => ReservaUtils.enriquecer(reservas, canchas),
+    [reservas, canchas],
+  );
+  const reservaIds = useMemo(() => reservas.map((r) => r.id), [reservas]);
+  const {
+    saldos,
+    loading: saldosLoading,
+    refrescar: refrescarSaldos,
+  } = useSaldosReservas(reservaIds);
 
   const handleSubmit = async (id: number) => {
-    if (!confirm("¿Estás seguro que deseás cancelar esta reserva?")) return;
+    const ok = await confirmar({
+      titulo: "Cancelar reserva",
+      texto: "¿Estás seguro que deseás cancelar esta reserva?",
+      confirmText: "Sí, cancelar",
+      cancelText: "No",
+      danger: true,
+    });
+    if (!ok) return;
     setCanceled(id);
     try {
       await ReservasService.cancelar(
@@ -67,11 +89,25 @@ export function ReservartionsPage() {
         <ReservationsTable
           loading={loading}
           error={error ?? ''}
-          reservas={reservas}
+          reservas={reservasView}
           handleSubmit={handleSubmit}
           canceled={canceled}
+          onPagar={setReservaPago}
+          saldos={saldos}
+          saldosLoading={saldosLoading}
         />
       </div>
+      {reservaPago && (
+        <ModalPagoReserva
+          reserva={reservaPago}
+          onClose={() => setReservaPago(null)}
+          onPagado={() => {
+            mostrar("Pago registrado correctamente", "success");
+            recargar();
+            refrescarSaldos();
+          }}
+        />
+      )}
     </PublicLayout>
   );
 }

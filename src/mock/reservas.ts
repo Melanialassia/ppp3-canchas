@@ -11,9 +11,12 @@ export const ADMIN_RESERVAS_HEADERS = [
 
 export const CLIENTE_RESERVAS_HEADERS = [
   "Fecha",
-  "Cancha",
   "Horario",
+  "Cancha",
   "Estado",
   "Total",
+  "Seña",
+  "Abonado",
+  "Falta",
   "",
 ];

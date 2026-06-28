@@ -29,6 +29,8 @@ export interface Reserva {
   fechaCreacion?: string
 }
 
+export type EstadoCliente = 'activo' | 'suspendido' | 'bloqueado'
+
 export interface Cliente {
   id: number
   nombre: string
@@ -36,7 +38,7 @@ export interface Cliente {
   telefono: string
   email?: string
   tipoClienteId?: number
-  estado?: string
+  estado?: EstadoCliente
   // Derivados (no provienen del recurso /clientes; se obtienen por endpoints aparte)
   descuentoPorcentaje?: number
   totalReservas?: number
@@ -66,4 +68,11 @@ export interface Pago {
   metodoPago: MetodoPago
   fechaPago: string
   observaciones?: string
+}
+
+// Respuesta de GET /pagos?reservaId= : pagos de la reserva + saldo derivado.
+export interface SaldoReserva {
+  pagos: Pago[]
+  totalPagado: number
+  saldoPendiente: number | null
 }

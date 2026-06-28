@@ -71,7 +71,7 @@ export function RegisterForm({ mostrar }: RegisterFormProps) {
       login(s);
 
       mostrar("¡Cuenta creada! Bienvenido.", "success");
-      setTimeout(() => navigate("/reservar"), 1200);
+      navigate("/reservar");
     } catch (err) {
       mostrar((err as Error).message || "Error al crear la cuenta", "error");
     } finally {

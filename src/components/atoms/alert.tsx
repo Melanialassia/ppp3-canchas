@@ -1,60 +1,52 @@
-import { useState, useEffect } from 'react'
+import Swal from 'sweetalert2'
 
-interface AlertProps {
-  mensaje: string
-  tipo?: 'success' | 'error' | 'warning' | 'info'
-  duracion?: number
-  onClose?: () => void
+type Tipo = 'success' | 'error' | 'warning' | 'info'
+
+// Toast en la esquina superior derecha, autocierre con barra de progreso.
+const Toast = Swal.mixin({
+  toast: true,
+  position: 'top-end',
+  showConfirmButton: false,
+  timer: 1800,
+  timerProgressBar: true,
+  didOpen: (el) => {
+    el.addEventListener('mouseenter', Swal.stopTimer)
+    el.addEventListener('mouseleave', Swal.resumeTimer)
+  },
+})
+
+export function notificar(mensaje: string, tipo: Tipo = 'info') {
+  Toast.fire({ icon: tipo, title: mensaje })
 }
 
-const VARIANT: Record<string, string> = {
-  success: 'bg-emerald-50 text-emerald-800 border-emerald-200',
-  error:   'bg-red-50 text-red-800 border-red-200',
-  warning: 'bg-amber-50 text-amber-800 border-amber-200',
-  info:    'bg-sky-50 text-sky-800 border-sky-200',
-}
-
-export function Alert({ mensaje, tipo = 'info', duracion = 4000, onClose }: AlertProps) {
-  const [visible, setVisible] = useState(true)
-
-  useEffect(() => {
-    if (!duracion) return
-    const t = setTimeout(() => { setVisible(false); onClose?.() }, duracion)
-    return () => clearTimeout(t)
-  }, [duracion, onClose])
-
-  if (!visible) return null
-
-  return (
-    <div
-      role="alert"
-      aria-live="polite"
-      className={`px-4 py-3.5 rounded-xl flex items-start gap-3 text-[13.5px] border fixed top-4 right-4 z-9999 min-w-70 max-w-sm shadow-lg ${VARIANT[tipo]}`}
-    >
-      <span className="flex-1">{mensaje}</span>
-      <button
-        aria-label="Cerrar alerta"
-        className="ml-3 text-lg leading-none opacity-60 hover:opacity-100 bg-transparent border-none cursor-pointer"
-        onClick={() => { setVisible(false); onClose?.() }}
-      >
-        ×
-      </button>
-    </div>
-  )
-}
-
+/**
+ * Hook de notificaciones. Mantiene la API previa (`mostrar` + `AlertComponent`) para no tocar las
+ * pantallas que lo consumen, pero ahora delega en un toast de SweetAlert2. `AlertComponent` ya no
+ * renderiza nada (SweetAlert se monta solo).
+ */
 export function useAlert() {
-  const [alert, setAlert] = useState<{ mensaje: string; tipo: 'success' | 'error' | 'warning' | 'info' } | null>(null)
+  return { mostrar: notificar, AlertComponent: null }
+}
 
-  function mostrar(mensaje: string, tipo: 'success' | 'error' | 'warning' | 'info' = 'info') {
-    setAlert({ mensaje, tipo })
-  }
-
-  function cerrar() { setAlert(null) }
-
-  const AlertComponent = alert
-    ? <Alert mensaje={alert.mensaje} tipo={alert.tipo} onClose={cerrar} />
-    : null
-
-  return { mostrar, AlertComponent }
+/** Diálogo de confirmación (sí/no) con SweetAlert2. Devuelve true si el usuario confirma. */
+export async function confirmar(opts: {
+  titulo: string
+  texto?: string
+  confirmText?: string
+  cancelText?: string
+  icon?: 'warning' | 'question' | 'error' | 'info'
+  danger?: boolean
+}): Promise<boolean> {
+  const res = await Swal.fire({
+    title: opts.titulo,
+    text: opts.texto,
+    icon: opts.icon ?? 'warning',
+    showCancelButton: true,
+    confirmButtonText: opts.confirmText ?? 'Confirmar',
+    cancelButtonText: opts.cancelText ?? 'Cancelar',
+    confirmButtonColor: opts.danger ? '#dc2626' : '#059669',
+    cancelButtonColor: '#64748b',
+    reverseButtons: true,
+  })
+  return res.isConfirmed
 }

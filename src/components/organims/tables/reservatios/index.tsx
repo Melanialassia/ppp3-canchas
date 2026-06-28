@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import type { Reserva } from "@/types";
+import type { Reserva, SaldoReserva } from "@/types";
 import { EmptyState } from "@/components/molecules";
 import { SkeletonTableRows } from "@/components/atoms";
 import { CLIENTE_RESERVAS_HEADERS } from "@/mock";
@@ -11,10 +11,16 @@ export const ReservationsTable = ({
   reservas,
   handleSubmit,
   canceled,
+  onPagar,
+  saldos,
+  saldosLoading,
 }: {
   reservas: Reserva[];
   canceled: number | null;
   handleSubmit: (id: number) => Promise<void>;
+  onPagar: (reserva: Reserva) => void;
+  saldos: Record<number, SaldoReserva>;
+  saldosLoading: boolean;
   loading: boolean;
   error: string;
 }) => {
@@ -58,6 +64,9 @@ export const ReservationsTable = ({
         canceled={canceled}
         handleSubmit={handleSubmit}
         reservas={reservas}
+        onPagar={onPagar}
+        saldos={saldos}
+        saldosLoading={saldosLoading}
       />
     )
   );

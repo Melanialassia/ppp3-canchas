@@ -1,0 +1,1 @@
+import{c as e,et as t}from"./index-D_Y6LvMN.js";var n=t();function r(){return(0,n.jsx)(e,{code:403,src:`/red-card.png`,title:`¡Roja directa!`,description:`No tenés permiso para entrar a esta sección.`,accentClassName:`text-red-400`})}export{r as ForbiddenPage};

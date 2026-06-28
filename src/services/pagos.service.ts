@@ -1,5 +1,5 @@
 import api from './api'
-import type { MetodoPago, TipoPago, Pago } from '@/types'
+import type { MetodoPago, TipoPago, Pago, SaldoReserva } from '@/types'
 
 export type { MetodoPago, TipoPago }
 
@@ -24,9 +24,9 @@ export const PagosService = {
     return data.data ?? data
   },
 
-  async obtenerPorReserva(reservaId: number) {
+  async obtenerPorReserva(reservaId: number): Promise<SaldoReserva> {
     const { data } = await api.get('/pagos', { params: { reservaId } })
-    return data
+    return data.data ?? data
   },
 
   async obtenerEstadisticas(): Promise<{

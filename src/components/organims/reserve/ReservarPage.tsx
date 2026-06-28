@@ -3,8 +3,9 @@ import { PublicLayout } from "@/components";
 import { Paso1Cliente } from "./Paso1Cliente";
 import { Paso2Horario } from "./Paso2Horario";
 import { Paso3Resumen } from "./Paso3Resumen";
+import { Paso4Pago } from "./Paso4Pago";
 import { PASOS } from "@/mock";
-import type { Cancha } from "@/types";
+import type { Cancha, Reserva } from "@/types";
 
 export interface DatosCliente {
   id: number | null;
@@ -25,9 +26,10 @@ export interface DatosReserva {
 }
 
 export function ReservarPage() {
-  const [paso, setPaso] = useState<1 | 2 | 3>(1);
+  const [paso, setPaso] = useState<1 | 2 | 3 | 4>(1);
   const [cliente, setCliente] = useState<DatosCliente | null>(null);
   const [reserva, setReserva] = useState<DatosReserva | null>(null);
+  const [reservaCreada, setReservaCreada] = useState<Reserva | null>(null);
 
   return (
     <PublicLayout>
@@ -61,7 +63,7 @@ export function ReservarPage() {
                   {p.label}
                 </span>
               </div>
-              {i < 2 && (
+              {i < PASOS.length - 1 && (
                 <div
                   className={`w-10 sm:w-16 h-px mx-1 sm:mx-2 mb-5 transition-colors duration-300 ${paso > p.n ? "bg-brand-400" : "bg-slate-200"}`}
                 />
@@ -92,8 +94,13 @@ export function ReservarPage() {
               cliente={cliente}
               reserva={reserva}
               onBack={() => setPaso(2)}
+              onCreated={(r) => {
+                setReservaCreada(r);
+                setPaso(4);
+              }}
             />
           )}
+          {paso === 4 && reservaCreada && <Paso4Pago reserva={reservaCreada} />}
         </div>
       </div>
 

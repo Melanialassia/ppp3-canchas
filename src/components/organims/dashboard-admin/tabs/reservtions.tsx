@@ -1,10 +1,10 @@
-import { useState } from 'react'
-import { useReservas } from '@/hooks'
+import { useMemo, useState } from 'react'
+import { useReservas, useCanchas, useClientes } from '@/hooks'
 import { ReservasService, PagosService } from '@/services'
 import type { MetodoPago, Reserva } from '@/types'
 import { Modal, useAlert } from '@/components'
 import { Select, SelectItem } from '@/components/atoms'
-import { MoneyUtils } from '@/utils'
+import { MoneyUtils, ReservaUtils } from '@/utils'
 import { AdminReservationsTable, type AccionItem } from '@/components/organims/tables'
 
 interface ConfirmModal {
@@ -22,6 +22,8 @@ export function ReservasTab() {
   if (filtroFecha) params.fecha = filtroFecha
   if (filtroEstado) params.estado = filtroEstado
   const { reservas, loading, error, recargar } = useReservas(params)
+  const { canchas } = useCanchas()
+  const { clientes } = useClientes({ limite: '1000' })
   const [modalPago, setModalPago] = useState<Reserva | null>(null)
   const [montoPago, setMontoPago] = useState('')
   const [metodoPago, setMetodoPago] = useState('efectivo')
@@ -30,11 +32,14 @@ export function ReservasTab() {
   const [ejecutando, setEjecutando] = useState(false)
 
   const [ordenFecha, setOrdenFecha] = useState<'desc' | 'asc'>('desc')
-  const reservasOrdenadas = [...reservas].sort((a, b) =>
-    ordenFecha === 'desc'
-      ? b.fecha.localeCompare(a.fecha)
-      : a.fecha.localeCompare(b.fecha)
-  )
+  const reservasOrdenadas = useMemo(() => {
+    const ordenadas = [...reservas].sort((a, b) =>
+      ordenFecha === 'desc'
+        ? b.fecha.localeCompare(a.fecha)
+        : a.fecha.localeCompare(b.fecha)
+    )
+    return ReservaUtils.enriquecer(ordenadas, canchas, clientes)
+  }, [reservas, ordenFecha, canchas, clientes])
 
   async function accion(id: number, estado: string) {
     setEjecutando(true)
