@@ -1,5 +1,5 @@
 import { DateUtils } from './date.utils'
-import { HORARIOS_DISPONIBLES } from '../config/constants'
+import { HORARIOS_DISPONIBLES } from '@/mock'
 
 export const HorarioUtils = {
   generarOpciones(fecha: string, horaInicio?: string): string[] {
@@ -16,9 +16,5 @@ export const HorarioUtils = {
   esPasado(fecha: string, horaFin: string): boolean {
     if (!DateUtils.esHoy(fecha)) return false
     return horaFin <= DateUtils.horaActual()
-  },
-
-  formatear(hora: string): string {
-    return hora
   },
 }

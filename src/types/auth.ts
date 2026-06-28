@@ -10,3 +10,11 @@ export interface Sesion {
   rol: Rol
   token: string
 }
+
+export interface RegistroData {
+  nombre: string
+  apellido: string
+  email: string
+  telefono: string
+  password: string
+}

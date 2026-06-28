@@ -1,16 +1,7 @@
 import api from "./api";
-import type { Sesion } from "../types/auth";
+import type { Sesion, RegistroData } from "@/types";
 
-export interface RegistroData {
-  nombre: string;
-  apellido: string;
-  email: string;
-  telefono: string;
-  password: string;
-}
-
-// El backend responde { access_token, usuario: { id, email, rol, nombre, apellido, cliente_id } }
-function mapearSesion(data: any): Sesion {
+function mapearSesion(data: Record<string, any>): Sesion {
   const u = data.usuario ?? {};
   return {
     id: u.id,

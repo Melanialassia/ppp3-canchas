@@ -5,11 +5,12 @@ const api = axios.create({
 });
 
 api.interceptors.request.use((config) => {
-  const raw = sessionStorage.getItem("sesion");
+  const raw = localStorage.getItem("sesion");
   if (raw) {
     try {
       const sesion = JSON.parse(raw);
       if (sesion?.token)
+
         config.headers.Authorization = `Bearer ${sesion.token}`;
     } catch {}
   }
@@ -21,8 +22,9 @@ api.interceptors.response.use(
   (err) => {
     const msg = err.response?.data?.message ?? "Error en la petición";
     if (err.response?.status === 401) {
-      sessionStorage.removeItem("sesion");
-      window.location.href = "/login";
+      const hadSession = !!localStorage.getItem("sesion");
+      localStorage.removeItem("sesion");
+      if (hadSession) window.location.href = "/login";
     }
     return Promise.reject(new Error(msg));
   },

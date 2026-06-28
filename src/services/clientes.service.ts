@@ -1,5 +1,5 @@
 import api from "./api";
-import type { Cliente } from "../types/api";
+import type { Cliente } from '@/types'
 
 export const ClientesService = {
   async obtenerTodos(params: Record<string, string> = {}): Promise<Cliente[]> {
@@ -32,8 +32,22 @@ export const ClientesService = {
     return data;
   },
 
-  async obtenerEstadisticas(id: number): Promise<unknown> {
-    const { data } = await api.get(`/clientes/${id}/estadisticas`);
-    return data;
+  async eliminar(id: number): Promise<void> {
+    await api.delete(`/clientes/${id}`);
+  },
+
+  async obtenerEstadisticas(): Promise<{
+    total: number
+    activos: number
+    suspendidos: number
+    bloqueados: number
+  }> {
+    const todos = await ClientesService.obtenerTodos({ limite: '1000' })
+    return {
+      total: todos.length,
+      activos: todos.filter(c => c.estado === 'activo').length,
+      suspendidos: todos.filter(c => c.estado === 'suspendido').length,
+      bloqueados: todos.filter(c => c.estado === 'bloqueado').length,
+    }
   },
 };
