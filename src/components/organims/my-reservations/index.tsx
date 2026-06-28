@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
-import { useAlert, confirmar } from "@/components/atoms";
+import { useAlert, confirmar, Select, SelectItem } from "@/components/atoms";
 import { useAuth } from "@/context";
 import { useReservas, useSaldosReservas, useCanchas } from "@/hooks";
 import { ReservasService } from "@/services";
@@ -16,16 +16,25 @@ export function ReservartionsPage() {
   const clienteId = sesion?.clienteId;
   const [canceled, setCanceled] = useState<number | null>(null);
   const [reservaPago, setReservaPago] = useState<Reserva | null>(null);
+  const [ordenFecha, setOrdenFecha] = useState<"asc" | "desc">("desc");
+  const [filtroEstado, setFiltroEstado] = useState("");
   const params = useMemo(
     () => (clienteId ? { clienteId: String(clienteId) } : undefined),
     [clienteId],
   );
   const { reservas, loading, error, recargar } = useReservas(params);
   const { canchas } = useCanchas();
-  const reservasView = useMemo(
-    () => ReservaUtils.enriquecer(reservas, canchas),
-    [reservas, canchas],
-  );
+  const reservasView = useMemo(() => {
+    const enriquecidas = ReservaUtils.enriquecer(reservas, canchas);
+    const filtradas = filtroEstado
+      ? enriquecidas.filter((r) => r.estado === filtroEstado)
+      : enriquecidas;
+    return [...filtradas].sort((a, b) =>
+      ordenFecha === "desc"
+        ? b.fecha.localeCompare(a.fecha)
+        : a.fecha.localeCompare(b.fecha)
+    );
+  }, [reservas, canchas, filtroEstado, ordenFecha]);
   const reservaIds = useMemo(() => reservas.map((r) => r.id), [reservas]);
   const {
     saldos,
@@ -81,6 +90,21 @@ export function ReservartionsPage() {
             <span className="sm:hidden">+ Nueva</span>
           </Link>
         </div>
+        <div className="flex gap-4 mb-6 flex-wrap items-end">
+          <div>
+            <label className="block mb-1.5 text-[13px] font-semibold text-slate-800 tracking-[0.01em]">
+              Estado
+            </label>
+            <Select value={filtroEstado} onValueChange={setFiltroEstado} placeholder="Todos">
+              <SelectItem value="">Todos</SelectItem>
+              <SelectItem value="pendiente">Pendiente</SelectItem>
+              <SelectItem value="confirmada">Confirmada</SelectItem>
+              <SelectItem value="completada">Completada</SelectItem>
+              <SelectItem value="cancelada">Cancelada</SelectItem>
+              <SelectItem value="no_show">No Show</SelectItem>
+            </Select>
+          </div>
+        </div>
         {error && (
           <div className="px-4 py-3.5 rounded-xl flex items-start gap-3 text-[13.5px] border bg-red-50 text-red-800 border-red-200 mb-4">
             {error}
@@ -95,6 +119,8 @@ export function ReservartionsPage() {
           onPagar={setReservaPago}
           saldos={saldos}
           saldosLoading={saldosLoading}
+          ordenFecha={ordenFecha}
+          onOrdenFecha={() => setOrdenFecha((v) => (v === "desc" ? "asc" : "desc"))}
         />
       </div>
       {reservaPago && (
@@ -102,6 +128,7 @@ export function ReservartionsPage() {
           reserva={reservaPago}
           onClose={() => setReservaPago(null)}
           onPagado={() => {
+            setReservaPago(null);
             mostrar("Pago registrado correctamente", "success");
             recargar();
             refrescarSaldos();

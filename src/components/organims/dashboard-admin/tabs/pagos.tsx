@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react'
-import { PagosService } from '@/services'
+import { PagosService, ReservasService } from '@/services'
 import { MoneyUtils } from '@/utils'
-import { Select, SelectItem } from '@/components/atoms'
+import { Select, SelectItem, notificar } from '@/components/atoms'
 import { PagosTable } from '@/components/organims/tables'
-import type { Pago } from '@/types'
+import { ModalPagoReserva } from '@/components/organims/my-reservations/ModalPagoReserva'
+import type { Pago, Reserva } from '@/types'
 
 export function PagosTab() {
   const [pagos, setPagos] = useState<Pago[]>([])
@@ -11,25 +12,34 @@ export function PagosTab() {
   const [error, setError] = useState('')
   const [filtroMetodo, setFiltroMetodo] = useState('')
   const [filtroTipo, setFiltroTipo] = useState('')
+  const [reservaPago, setReservaPago] = useState<Reserva | null>(null)
 
-  useEffect(() => {
-    async function cargar() {
-      setLoading(true)
-      setError('')
-      try {
-        const params: Record<string, string> = {}
-        if (filtroMetodo) params.metodoPago = filtroMetodo
-        if (filtroTipo) params.tipoPago = filtroTipo
-        const data = await PagosService.obtenerTodos(params)
-        setPagos(data)
-      } catch (err) {
-        setError((err as Error).message || 'Error al cargar los pagos')
-      } finally {
-        setLoading(false)
-      }
+  async function handleRegistrarSaldo(pago: Pago) {
+    try {
+      const reserva = await ReservasService.obtenerPorId(pago.reservaId)
+      setReservaPago(reserva)
+    } catch {
+      notificar('No se pudo cargar la reserva', 'error')
     }
-    cargar()
-  }, [filtroMetodo, filtroTipo])
+  }
+
+  async function cargar() {
+    setLoading(true)
+    setError('')
+    try {
+      const params: Record<string, string> = {}
+      if (filtroMetodo) params.metodoPago = filtroMetodo
+      if (filtroTipo) params.tipoPago = filtroTipo
+      const data = await PagosService.obtenerTodos(params)
+      setPagos(data)
+    } catch (err) {
+      setError((err as Error).message || 'Error al cargar los pagos')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => { cargar() }, [filtroMetodo, filtroTipo])
 
   const totalMostrado = pagos.reduce((s, p) => s + +p.monto, 0)
 
@@ -76,7 +86,24 @@ export function PagosTab() {
         </div>
       )}
 
-      <PagosTable pagos={pagos} loading={loading} error={error} />
+      <PagosTable
+        pagos={pagos}
+        loading={loading}
+        error={error}
+        onRegistrarSaldo={handleRegistrarSaldo}
+      />
+
+      {reservaPago && (
+        <ModalPagoReserva
+          reserva={reservaPago}
+          onClose={() => setReservaPago(null)}
+          onPagado={() => {
+            setReservaPago(null)
+            notificar('Pago registrado correctamente', 'success')
+            cargar()
+          }}
+        />
+      )}
     </div>
   )
 }

@@ -5,10 +5,11 @@ type Tipo = 'success' | 'error' | 'warning' | 'info'
 // Toast en la esquina superior derecha, autocierre con barra de progreso.
 const Toast = Swal.mixin({
   toast: true,
-  position: 'top-end',
+  position: 'bottom-end',
   showConfirmButton: false,
   timer: 1800,
   timerProgressBar: true,
+  customClass: { container: '!z-[9999]' },
   didOpen: (el) => {
     el.addEventListener('mouseenter', Swal.stopTimer)
     el.addEventListener('mouseleave', Swal.resumeTimer)

@@ -52,7 +52,6 @@ export function ModalPagoReserva({ reserva, onClose, onPagado }: Props) {
               </ul>
             </div>
           )}
-
           {pagado ? (
             <div className="px-4 py-3.5 rounded-xl text-[13.5px] border bg-emerald-50 text-emerald-800 border-emerald-200">
               Esta reserva ya está pagada en su totalidad.

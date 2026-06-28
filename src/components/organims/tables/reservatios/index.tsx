@@ -14,6 +14,8 @@ export const ReservationsTable = ({
   onPagar,
   saldos,
   saldosLoading,
+  ordenFecha,
+  onOrdenFecha,
 }: {
   reservas: Reserva[];
   canceled: number | null;
@@ -23,6 +25,8 @@ export const ReservationsTable = ({
   saldosLoading: boolean;
   loading: boolean;
   error: string;
+  ordenFecha: "asc" | "desc";
+  onOrdenFecha: () => void;
 }) => {
   if (loading) {
     return (
@@ -30,13 +34,14 @@ export const ReservationsTable = ({
         <table className="w-full border-collapse bg-white text-[13.5px]">
           <thead className="bg-slate-50 border-b border-slate-200">
             <tr>
+              <th className="px-4 py-3" style={{ width: 40 }} />
               {CLIENTE_RESERVAS_HEADERS.map(h => (
                 <th key={h} className="px-4 py-3 text-left text-[11px] font-bold text-slate-400 uppercase tracking-[0.08em] whitespace-nowrap">{h}</th>
               ))}
             </tr>
           </thead>
           <tbody>
-            <SkeletonTableRows rows={4} cols={CLIENTE_RESERVAS_HEADERS.length} />
+            <SkeletonTableRows rows={4} cols={CLIENTE_RESERVAS_HEADERS.length + 1} />
           </tbody>
         </table>
       </div>
@@ -67,6 +72,8 @@ export const ReservationsTable = ({
         onPagar={onPagar}
         saldos={saldos}
         saldosLoading={saldosLoading}
+        ordenFecha={ordenFecha}
+        onOrdenFecha={onOrdenFecha}
       />
     )
   );

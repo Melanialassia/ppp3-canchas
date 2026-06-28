@@ -16,7 +16,7 @@ export function Modal({ titulo, children, onClose, footer }: ModalProps) {
 
   return (
     <div
-      className="fixed inset-0 bg-slate-950/60 flex items-center justify-center z-[2000] p-4 backdrop-blur-[4px] animate-fade-in"
+      className="fixed inset-0 bg-slate-950/60 flex items-center justify-center z-[2000] p-4 animate-fade-in"
       onClick={e => { if (e.target === e.currentTarget) onClose() }}
     >
       <div

@@ -1,6 +1,4 @@
-import { useEffect, useRef, useState } from "react";
-import { createPortal } from "react-dom";
-import { BadgeReserva } from "@/components/atoms";
+import { BadgeReserva, DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/atoms";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import type { Reserva } from "@/types";
 import { DateUtils, MoneyUtils } from "@/utils";
@@ -12,66 +10,25 @@ export interface AccionItem {
 }
 
 function DotsMenu({ acciones }: { acciones: AccionItem[] }) {
-  const [open, setOpen] = useState(false);
-  const [pos, setPos] = useState({ top: 0, left: 0 });
-  const triggerRef = useRef<HTMLButtonElement>(null);
-  const contentRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!open) return;
-    const handler = (e: MouseEvent) => {
-      const target = e.target as Node;
-      const inTrigger = triggerRef.current?.contains(target) ?? false;
-      const inContent = contentRef.current?.contains(target) ?? false;
-      if (!inTrigger && !inContent) setOpen(false);
-    };
-    document.addEventListener("mouseover", handler);
-    return () => document.removeEventListener("mouseover", handler);
-  }, [open]);
-
-  function handleOpen() {
-    const rect = triggerRef.current?.getBoundingClientRect();
-    if (!rect) return;
-    setPos({ top: rect.bottom + 4, left: rect.left });
-    setOpen(true);
-  }
-
   if (acciones?.length === 0) return <span />;
-
   return (
-    <>
-      <button
-        ref={triggerRef}
-        className="p-1.5 rounded hover:bg-slate-100 text-slate-400 hover:text-slate-700 transition-colors"
-        aria-label="Acciones"
-        onClick={handleOpen}
-      >
-        <BsThreeDotsVertical size={16} />
-      </button>
-
-      {open && createPortal(
-        <div
-          ref={contentRef}
-          style={{ top: pos.top, left: pos.left }}
-          className="fixed z-50 min-w-[160px] overflow-hidden rounded-lg border border-slate-200 bg-white py-1 shadow-lg"
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <button
+          className="p-1.5 rounded hover:bg-slate-100 text-slate-400 hover:text-slate-700 transition-colors"
+          aria-label="Acciones"
         >
-          {acciones.map((item) => (
-            <button
-              key={item.label}
-              className={`flex w-full items-center px-4 py-2 text-[13px] transition-colors bg-transparent border-none cursor-pointer font-[inherit] text-left ${
-                item.variant === "danger"
-                  ? "text-red-600 hover:bg-red-50 hover:text-red-700"
-                  : "text-slate-700 hover:bg-slate-50 hover:text-slate-900"
-              }`}
-              onClick={() => { item.onClick(); setOpen(false); }}
-            >
-              {item.label}
-            </button>
-          ))}
-        </div>,
-        document.body
-      )}
-    </>
+          <BsThreeDotsVertical size={16} />
+        </button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="start">
+        {acciones.map((item) => (
+          <DropdownMenuItem key={item.label} variant={item.variant} onSelect={item.onClick}>
+            {item.label}
+          </DropdownMenuItem>
+        ))}
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }
 

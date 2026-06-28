@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { PagosService } from '@/services'
 import { MoneyUtils } from '@/utils'
-import { Select, SelectItem } from '@/components/atoms'
+import { Select, SelectItem, notificar } from '@/components/atoms'
 import type { MetodoPago, Pago, TipoPago } from '@/types'
 
 interface Props {
@@ -37,7 +37,7 @@ export function PagoForm({
   const [monto, setMonto] = useState(String(montoSugerido))
   const [metodo, setMetodo] = useState<MetodoPago>('efectivo')
   const [procesando, setProcesando] = useState(false)
-  const [error, setError] = useState('')
+  const [errorCampo, setErrorCampo] = useState('')
 
   function derivarTipoPago(valor: number): TipoPago {
     const nuevoTotal = totalPagadoPrevio + valor
@@ -49,11 +49,15 @@ export function PagoForm({
   async function pagar() {
     const valor = parseFloat(monto)
     if (!valor || valor <= 0) {
-      setError('Ingresá un monto válido')
+      setErrorCampo('Ingresá un monto válido')
+      return
+    }
+    if (valor > restante) {
+      setErrorCampo(`El monto no puede superar el saldo pendiente (${MoneyUtils.formatear(restante)})`)
       return
     }
     setProcesando(true)
-    setError('')
+    setErrorCampo('')
     try {
       const pago = await PagosService.registrar(
         reservaId,
@@ -63,7 +67,7 @@ export function PagoForm({
       )
       onPagado(pago)
     } catch (err) {
-      setError((err as Error).message || 'Error al registrar el pago')
+      notificar((err as Error).message || 'Error al registrar el pago', 'error')
     } finally {
       setProcesando(false)
     }
@@ -114,12 +118,20 @@ export function PagoForm({
         </div>
         <input
           type="number"
-          className="form-input"
+          className={`form-input${parseFloat(monto) > restante ? ' border-red-400 focus:ring-red-300' : ''}`}
           min={0}
           max={restante}
           value={monto}
-          onChange={(e) => setMonto(e.target.value)}
+          onChange={(e) => {
+            setMonto(e.target.value)
+            setErrorCampo('')
+          }}
         />
+        {parseFloat(monto) > restante && (
+          <p className="text-red-600 text-[12px] mt-1">
+            El monto supera el saldo pendiente ({MoneyUtils.formatear(restante)})
+          </p>
+        )}
       </div>
 
       <div className="mb-5">
@@ -133,9 +145,9 @@ export function PagoForm({
         </Select>
       </div>
 
-      {error && (
+      {errorCampo && (
         <div className="px-4 py-3 rounded-xl text-[13.5px] border bg-red-50 text-red-800 border-red-200 mb-4">
-          {error}
+          {errorCampo}
         </div>
       )}
 

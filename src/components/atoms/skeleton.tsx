@@ -30,6 +30,7 @@ export function SkeletonTableRows({ rows = 5, cols = 5 }: { rows?: number; cols?
   )
 }
 
+
 export function SkeletonCanchaCard() {
   return (
     <div className="bg-white rounded-2xl border border-slate-200/80 p-5">

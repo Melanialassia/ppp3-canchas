@@ -18,5 +18,4 @@ export const CLIENTE_RESERVAS_HEADERS = [
   "Seña",
   "Abonado",
   "Falta",
-  "",
 ];
