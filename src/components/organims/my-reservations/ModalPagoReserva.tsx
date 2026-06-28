@@ -28,7 +28,9 @@ export function ModalPagoReserva({ reserva, onClose, onPagado }: Props) {
             <div className="mb-5">
               <h4 className="text-[13px] font-bold text-slate-800 mb-2">Pagos registrados</h4>
               <ul className="divide-y divide-slate-100 rounded-xl border border-slate-100 overflow-hidden">
-                {data.pagos.map((p) => (
+                {data.pagos.map((p) => {
+                  const { fecha, hora } = DateUtils.formatearFechaHora(p.fechaPago)
+                  return (
                   <li
                     key={p.id}
                     className="flex items-center justify-between px-3 py-2.5 text-[13px]"
@@ -41,14 +43,19 @@ export function ModalPagoReserva({ reserva, onClose, onPagado }: Props) {
                         {" · "}
                         {METODO_LABEL[p.metodoPago] ?? p.metodoPago}
                         {" · "}
-                        {DateUtils.formatearFecha(p.fechaPago)}
+                        {fecha}
+                        {" "}
+                        <span className="text-slate-300">·</span>
+                        {" "}
+                        {hora}
                       </span>
                     </div>
                     <span className="font-semibold text-emerald-700">
                       {MoneyUtils.formatear(p.monto)}
                     </span>
                   </li>
-                ))}
+                  )
+                })}
               </ul>
             </div>
           )}

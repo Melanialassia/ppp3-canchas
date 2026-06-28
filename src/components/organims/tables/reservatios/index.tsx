@@ -19,7 +19,7 @@ export const ReservationsTable = ({
 }: {
   reservas: Reserva[];
   canceled: number | null;
-  handleSubmit: (id: number) => Promise<void>;
+  handleSubmit: (id: number) => void;
   onPagar: (reserva: Reserva) => void;
   saldos: Record<number, SaldoReserva>;
   saldosLoading: boolean;

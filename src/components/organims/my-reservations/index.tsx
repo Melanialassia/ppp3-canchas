@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
-import { useAlert, confirmar, Select, SelectItem } from "@/components/atoms";
+import { useAlert, Select, SelectItem, Modal } from "@/components/atoms";
 import { useAuth } from "@/context";
 import { useReservas, useSaldosReservas, useCanchas } from "@/hooks";
 import { ReservasService } from "@/services";
@@ -16,6 +16,8 @@ export function ReservartionsPage() {
   const clienteId = sesion?.clienteId;
   const [canceled, setCanceled] = useState<number | null>(null);
   const [reservaPago, setReservaPago] = useState<Reserva | null>(null);
+  const [reservaACancelar, setReservaACancelar] = useState<Reserva | null>(null);
+  const [cancelando, setCancelando] = useState(false);
   const [ordenFecha, setOrdenFecha] = useState<"asc" | "desc">("desc");
   const [filtroEstado, setFiltroEstado] = useState("");
   const params = useMemo(
@@ -42,19 +44,13 @@ export function ReservartionsPage() {
     refrescar: refrescarSaldos,
   } = useSaldosReservas(reservaIds);
 
-  const handleSubmit = async (id: number) => {
-    const ok = await confirmar({
-      titulo: "Cancelar reserva",
-      texto: "¿Estás seguro que deseás cancelar esta reserva?",
-      confirmText: "Sí, cancelar",
-      cancelText: "No",
-      danger: true,
-    });
-    if (!ok) return;
-    setCanceled(id);
+  async function confirmarCancelacion() {
+    if (!reservaACancelar) return;
+    setCancelando(true);
+    setCanceled(reservaACancelar.id);
     try {
       await ReservasService.cancelar(
-        id,
+        reservaACancelar.id,
         "Cancelado por el cliente desde el portal",
       );
       mostrar("Reserva cancelada correctamente", "success");
@@ -65,9 +61,11 @@ export function ReservartionsPage() {
         "error",
       );
     } finally {
+      setCancelando(false);
       setCanceled(null);
+      setReservaACancelar(null);
     }
-  };
+  }
 
   return (
     <PublicLayout>
@@ -114,7 +112,10 @@ export function ReservartionsPage() {
           loading={loading}
           error={error ?? ''}
           reservas={reservasView}
-          handleSubmit={handleSubmit}
+          handleSubmit={(id) => {
+            const r = reservas.find((r) => r.id === id);
+            if (r) setReservaACancelar(r);
+          }}
           canceled={canceled}
           onPagar={setReservaPago}
           saldos={saldos}
@@ -123,6 +124,36 @@ export function ReservartionsPage() {
           onOrdenFecha={() => setOrdenFecha((v) => (v === "desc" ? "asc" : "desc"))}
         />
       </div>
+
+      {reservaACancelar && (
+        <Modal
+          titulo="Cancelar reserva"
+          onClose={() => setReservaACancelar(null)}
+          footer={
+            <div className="flex gap-2 justify-end">
+              <button
+                className="btn btn-outline"
+                onClick={() => setReservaACancelar(null)}
+                disabled={cancelando}
+              >
+                No
+              </button>
+              <button
+                className="btn btn-danger"
+                onClick={confirmarCancelacion}
+                disabled={cancelando}
+              >
+                {cancelando ? "Cancelando…" : "Sí, cancelar"}
+              </button>
+            </div>
+          }
+        >
+          <p className="text-slate-600">
+            ¿Estás seguro que deseás cancelar la reserva <span className="font-semibold text-slate-800">#{reservaACancelar.id}</span>? Esta acción no se puede deshacer.
+          </p>
+        </Modal>
+      )}
+
       {reservaPago && (
         <ModalPagoReserva
           reserva={reservaPago}

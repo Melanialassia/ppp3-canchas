@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { CanchasService, ReservasService } from "@/services";
 import { DateUtils, HorarioUtils, MoneyUtils } from "@/utils";
 import { Spinner } from "@/components";
+import { Select, SelectItem } from "@/components/atoms";
 import { PASO2_EMPTY } from "@/mock";
 import type { Cancha, Reserva } from "@/types";
 import type { DatosReserva } from "./ReservarPage";
@@ -137,21 +138,21 @@ export function Paso2Horario({ onNext, onBack }: Props) {
         <>
           <div className="mb-5">
             <label className="block mb-1.5 text-[13px] font-semibold text-slate-800 tracking-[0.01em]">Cancha <span className="text-red-500">*</span></label>
-            <select
-              className={`form-select ${errors.cancha ? "border-red-400 focus:border-red-400" : ""}`}
-              value={canchaId}
-              onChange={(e) => {
-                setCanchaId(e.target.value ? Number(e.target.value) : "");
-                setErrors((v) => ({ ...v, cancha: "" }));
+            <Select
+              value={canchaId ? String(canchaId) : ""}
+              onValueChange={(v) => {
+                setCanchaId(v ? Number(v) : "");
+                setErrors((prev) => ({ ...prev, cancha: "" }));
               }}
+              placeholder="Seleccioná una cancha"
+              className={errors.cancha ? "border-red-400 focus:border-red-400" : ""}
             >
-              <option value="">Seleccioná una cancha</option>
               {canchas.map((c) => (
-                <option key={c.id} value={c.id}>
+                <SelectItem key={c.id} value={String(c.id)}>
                   {c.nombre} — {MoneyUtils.formatear(c.precioPorHora)}/hora
-                </option>
+                </SelectItem>
               ))}
-            </select>
+            </Select>
             <FieldError msg={errors.cancha} />
           </div>
 
@@ -245,21 +246,21 @@ export function Paso2Horario({ onNext, onBack }: Props) {
               </div>
               <div className="mb-5">
                 <label className="block mb-1.5 text-[13px] font-semibold text-slate-800 tracking-[0.01em]">Hora de fin <span className="text-red-500">*</span></label>
-                <select
-                  className={`form-select ${errors.horaFin ? "border-red-400 focus:border-red-400" : ""}`}
+                <Select
                   value={horaFin}
-                  onChange={(e) => {
-                    setHoraFin(e.target.value);
-                    setErrors((v) => ({ ...v, horaFin: "" }));
+                  onValueChange={(v) => {
+                    setHoraFin(v);
+                    setErrors((prev) => ({ ...prev, horaFin: "" }));
                   }}
+                  placeholder="Elegí hora de fin"
+                  className={errors.horaFin ? "border-red-400 focus:border-red-400" : ""}
                 >
-                  <option value="">Elegí hora de fin</option>
                   {opcionesFin.map((h) => (
-                    <option key={h} value={h}>
+                    <SelectItem key={h} value={h}>
                       {h}
-                    </option>
+                    </SelectItem>
                   ))}
-                </select>
+                </Select>
                 <FieldError msg={errors.horaFin} />
               </div>
             </div>

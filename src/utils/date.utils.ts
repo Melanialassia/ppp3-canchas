@@ -5,6 +5,15 @@ export const DateUtils = {
     return `${day}/${month}/${year}`
   },
 
+  formatearFechaHora(iso: string): { fecha: string; hora: string } {
+    if (!iso) return { fecha: '', hora: '' }
+    const d = new Date(iso)
+    return {
+      fecha: d.toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit', year: 'numeric' }),
+      hora: d.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' }),
+    }
+  },
+
   formatearFechaCompleta(fecha: string): string {
     if (!fecha) return ''
     const date = new Date(fecha + 'T00:00:00')
