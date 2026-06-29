@@ -1,5 +1,5 @@
-import { useState, useMemo } from "react";
-import { Link } from "react-router-dom";
+import { useState, useMemo, useEffect } from "react";
+import { Link, useSearchParams } from "react-router-dom";
 import { useAlert, Select, SelectItem, Modal } from "@/components/atoms";
 import { useAuth } from "@/context";
 import { useReservas, useSaldosReservas, useCanchas } from "@/hooks";
@@ -43,6 +43,43 @@ export function ReservartionsPage() {
     loading: saldosLoading,
     refrescar: refrescarSaldos,
   } = useSaldosReservas(reservaIds);
+
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  useEffect(() => {
+    const status = searchParams.get("status");
+    const paymentId = searchParams.get("payment_id");
+    const collectionStatus = searchParams.get("collection_status");
+    const finalStatus = status || collectionStatus;
+
+    if (finalStatus || paymentId) {
+      if (finalStatus === "approved" || finalStatus === "success") {
+        mostrar("¡Pago realizado con éxito! Tu reserva ha sido confirmada.", "success");
+      } else if (finalStatus === "pending" || finalStatus === "in_process") {
+        mostrar("El pago está en proceso de acreditación.", "info");
+      } else {
+        mostrar("El pago fue rechazado, cancelado o falló. Por favor, reintentalo.", "error");
+      }
+
+      // Clean query parameters from URL so that refreshing the page doesn't alert again
+      const newParams = new URLSearchParams(searchParams);
+      newParams.delete("status");
+      newParams.delete("payment_id");
+      newParams.delete("preference_id");
+      newParams.delete("merchant_order_id");
+      newParams.delete("collection_id");
+      newParams.delete("collection_status");
+      newParams.delete("payment_type");
+      newParams.delete("processing_mode");
+      newParams.delete("site_id");
+      newParams.delete("merchant_account_id");
+      setSearchParams(newParams, { replace: true });
+
+      // Refresh the reservation list and their balances
+      recargar();
+      refrescarSaldos();
+    }
+  }, [searchParams, setSearchParams, recargar, refrescarSaldos, mostrar]);
 
   async function confirmarCancelacion() {
     if (!reservaACancelar) return;

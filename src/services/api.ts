@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL ?? "http://localhost:3000",
+  baseURL: "https://api-gateway-reservas-cancha.vercel.app/",
 });
 
 api.interceptors.request.use((config) => {
@@ -10,9 +10,8 @@ api.interceptors.request.use((config) => {
     try {
       const sesion = JSON.parse(raw);
       if (sesion?.token)
-
         config.headers.Authorization = `Bearer ${sesion.token}`;
-    } catch {}
+    } catch { }
   }
   return config;
 });
@@ -22,9 +21,8 @@ api.interceptors.response.use(
   (err) => {
     const msg = err.response?.data?.message ?? "Error en la petición";
     if (err.response?.status === 401) {
-      const hadSession = !!localStorage.getItem("sesion");
       localStorage.removeItem("sesion");
-      if (hadSession) window.location.href = "/login";
+      window.location.href = "/login";
     }
     return Promise.reject(new Error(msg));
   },
