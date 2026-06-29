@@ -37,4 +37,15 @@ export const PagosService = {
     const { data } = await api.get('/pagos/estadisticas')
     return data.data ?? data
   },
+
+  // Genera la preferencia de pago en MercadoPago vía el backend
+  async crearPreferencia(datos: {
+    title: string
+    unit_price: number
+    quantity: number
+    reservaId: number
+  }): Promise<{ preferenceId: string }> {
+    const { data } = await api.post<{ preferenceId: string }>('/pagos/mercadopago/preferencia', datos)
+    return data
+  },
 }
