@@ -26,4 +26,8 @@ export const CanchasService = {
     const { data } = await api.patch(`/canchas/${id}`, { estado });
     return data;
   },
+
+  async eliminar(id: number): Promise<void> {
+    await api.delete(`/canchas/${id}`);
+  },
 };

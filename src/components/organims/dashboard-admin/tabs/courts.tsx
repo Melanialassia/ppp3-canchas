@@ -20,15 +20,19 @@ export function CanchasTab() {
   const { mostrar, AlertComponent } = useAlert()
   const [canchaModal, setCanchaModal] = useState<Cancha | null>(null)
   const [nuevoEstado, setNuevoEstado] = useState<EstadoCancha>('disponible')
+  const [conflictoEstado, setConflictoEstado] = useState('')
   const [guardando, setGuardando] = useState(false)
   const [formAbierto, setFormAbierto] = useState(false)
   const [editando, setEditando] = useState<Cancha | null>(null)
   const [form, setForm] = useState<FormCancha>(FORM_CANCHA_VACIO)
   const [formErrors, setFormErrors] = useState<FormErrors>(FORM_CANCHA_ERRORS_EMPTY)
+  const [confirmDelete, setConfirmDelete] = useState<Cancha | null>(null)
+  const [eliminando, setEliminando] = useState(false)
 
   function abrirModal(cancha: Cancha) {
     setCanchaModal(cancha)
     setNuevoEstado(cancha.estado)
+    setConflictoEstado('')
   }
 
   function abrirAlta() {
@@ -53,15 +57,38 @@ export function CanchasTab() {
   async function cambiarEstado() {
     if (!canchaModal) return
     setGuardando(true)
+    setConflictoEstado('')
     try {
       await CanchasService.cambiarEstado(canchaModal.id, nuevoEstado)
       mostrar('Estado actualizado', 'success')
       setCanchaModal(null)
       recargar()
     } catch (err) {
-      mostrar((err as Error).message, 'error')
+      const e = err as Error & { status?: number }
+      // 409: la cancha tiene reservas activas a futuro. Mantenemos el modal abierto y
+      // mostramos el conflicto inline para que el admin entienda por qué no se aplicó.
+      if (e.status === 409) {
+        setConflictoEstado(e.message)
+      } else {
+        mostrar(e.message, 'error')
+      }
     } finally {
       setGuardando(false)
+    }
+  }
+
+  async function eliminarCancha() {
+    if (!confirmDelete) return
+    setEliminando(true)
+    try {
+      await CanchasService.eliminar(confirmDelete.id)
+      mostrar('Cancha eliminada', 'success')
+      setConfirmDelete(null)
+      recargar()
+    } catch (err) {
+      mostrar((err as Error).message || 'Error al eliminar la cancha', 'error')
+    } finally {
+      setEliminando(false)
     }
   }
 
@@ -115,6 +142,7 @@ export function CanchasTab() {
                 mode="admin"
                 onCambiarEstado={abrirModal}
                 onEditar={abrirEdicion}
+                onEliminar={setConfirmDelete}
               />
             ))
         }
@@ -135,12 +163,41 @@ export function CanchasTab() {
         >
           <div className="mb-5">
             <label className="block mb-1.5 text-[13px] font-semibold text-slate-800 tracking-[0.01em]">Nuevo estado</label>
-            <Select value={nuevoEstado} onValueChange={v => setNuevoEstado(v as EstadoCancha)}>
+            <Select value={nuevoEstado} onValueChange={v => { setNuevoEstado(v as EstadoCancha); setConflictoEstado('') }}>
               <SelectItem value="disponible">Disponible</SelectItem>
               <SelectItem value="mantenimiento">Mantenimiento</SelectItem>
               <SelectItem value="fuera_servicio">Fuera de servicio</SelectItem>
             </Select>
+            {conflictoEstado && (
+              <div className="mt-3 px-4 py-3 rounded-xl text-[13px] border bg-amber-50 text-amber-800 border-amber-200">
+                {conflictoEstado} Cancelá o reprogramá esas reservas antes de cambiar el estado.
+              </div>
+            )}
           </div>
+        </Modal>
+      )}
+
+      {confirmDelete && (
+        <Modal
+          titulo="Eliminar cancha"
+          onClose={() => setConfirmDelete(null)}
+          footer={
+            <div className="flex gap-2 justify-end">
+              <button className="btn btn-outline" onClick={() => setConfirmDelete(null)}>Cancelar</button>
+              <button
+                className="btn btn-primary bg-red-600 hover:bg-red-700 border-red-600"
+                onClick={eliminarCancha}
+                disabled={eliminando}
+              >
+                {eliminando ? 'Eliminando' : 'Eliminar'}
+              </button>
+            </div>
+          }
+        >
+          <p className="text-slate-600">
+            ¿Querés eliminar la cancha <strong>{confirmDelete.nombre}</strong>? Esta acción no se
+            puede deshacer. No se podrá eliminar si tiene reservas activas a futuro.
+          </p>
         </Modal>
       )}
 

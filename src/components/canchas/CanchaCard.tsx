@@ -3,13 +3,14 @@ import type { Cancha } from "@/types";
 import { MoneyUtils } from "@/utils";
 import { BadgeCancha } from "@/components/atoms";
 import { CAPACITY_LABEL, CAPACITY_COLOR } from "@/mock";
-import { LuUsers, LuDollarSign, LuPencil, LuArrowRight } from "react-icons/lu";
+import { LuUsers, LuDollarSign, LuPencil, LuArrowRight, LuTrash2 } from "react-icons/lu";
 
 interface Props {
   cancha: Cancha;
   mode?: "public" | "admin";
   onCambiarEstado?: (cancha: Cancha) => void;
   onEditar?: (cancha: Cancha) => void;
+  onEliminar?: (cancha: Cancha) => void;
 }
 
 export function CanchaCard({
@@ -17,6 +18,7 @@ export function CanchaCard({
   mode = "public",
   onCambiarEstado,
   onEditar,
+  onEliminar,
 }: Props) {
   const navigate = useNavigate();
   const gradientClass =
@@ -104,6 +106,14 @@ export function CanchaCard({
               onClick={() => onCambiarEstado?.(cancha)}
             >
               Estado
+            </button>
+            <button
+              className="btn btn-outline text-[13px] text-red-600 hover:bg-red-50 hover:border-red-300"
+              onClick={() => onEliminar?.(cancha)}
+              title="Eliminar cancha"
+              aria-label="Eliminar cancha"
+            >
+              <LuTrash2 size={14} />
             </button>
           </div>
         )}
