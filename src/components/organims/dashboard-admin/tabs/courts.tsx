@@ -20,7 +20,6 @@ export function CanchasTab() {
   const { mostrar, AlertComponent } = useAlert()
   const [canchaModal, setCanchaModal] = useState<Cancha | null>(null)
   const [nuevoEstado, setNuevoEstado] = useState<EstadoCancha>('disponible')
-  const [conflictoEstado, setConflictoEstado] = useState('')
   const [guardando, setGuardando] = useState(false)
   const [formAbierto, setFormAbierto] = useState(false)
   const [editando, setEditando] = useState<Cancha | null>(null)
@@ -32,7 +31,6 @@ export function CanchasTab() {
   function abrirModal(cancha: Cancha) {
     setCanchaModal(cancha)
     setNuevoEstado(cancha.estado)
-    setConflictoEstado('')
   }
 
   function abrirAlta() {
@@ -57,7 +55,6 @@ export function CanchasTab() {
   async function cambiarEstado() {
     if (!canchaModal) return
     setGuardando(true)
-    setConflictoEstado('')
     try {
       await CanchasService.cambiarEstado(canchaModal.id, nuevoEstado)
       mostrar('Estado actualizado', 'success')
@@ -65,10 +62,8 @@ export function CanchasTab() {
       recargar()
     } catch (err) {
       const e = err as Error & { status?: number }
-      // 409: la cancha tiene reservas activas a futuro. Mantenemos el modal abierto y
-      // mostramos el conflicto inline para que el admin entienda por qué no se aplicó.
       if (e.status === 409) {
-        setConflictoEstado(e.message)
+        mostrar(`${e.message} Cancelá o reprogramá esas reservas antes de cambiar el estado.`, 'warning')
       } else {
         mostrar(e.message, 'error')
       }
@@ -163,16 +158,11 @@ export function CanchasTab() {
         >
           <div className="mb-5">
             <label className="block mb-1.5 text-[13px] font-semibold text-slate-800 tracking-[0.01em]">Nuevo estado</label>
-            <Select value={nuevoEstado} onValueChange={v => { setNuevoEstado(v as EstadoCancha); setConflictoEstado('') }}>
+            <Select value={nuevoEstado} onValueChange={v => setNuevoEstado(v as EstadoCancha)}>
               <SelectItem value="disponible">Disponible</SelectItem>
               <SelectItem value="mantenimiento">Mantenimiento</SelectItem>
               <SelectItem value="fuera_servicio">Fuera de servicio</SelectItem>
             </Select>
-            {conflictoEstado && (
-              <div className="mt-3 px-4 py-3 rounded-xl text-[13px] border bg-amber-50 text-amber-800 border-amber-200">
-                {conflictoEstado} Cancelá o reprogramá esas reservas antes de cambiar el estado.
-              </div>
-            )}
           </div>
         </Modal>
       )}
