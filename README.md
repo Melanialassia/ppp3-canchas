@@ -1,4 +1,4 @@
-# Sistema de Reservas de Canchas
+# FutbolReservas — Sistema de Reservas de Canchas
 
 Aplicación web para la gestión de reservas de canchas deportivas. Permite a los clientes reservar canchas en un flujo guiado de 4 pasos y a los administradores gestionar canchas, clientes, reservas y pagos desde un panel de control centralizado.
 
