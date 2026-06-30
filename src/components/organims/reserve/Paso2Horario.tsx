@@ -4,7 +4,7 @@ import { DateUtils, HorarioUtils, MoneyUtils } from "@/utils";
 import { Spinner } from "@/components";
 import { Select, SelectItem } from "@/components/atoms";
 import { PASO2_EMPTY } from "@/mock";
-import type { Cancha, Reserva } from "@/types";
+import type { Cancha, SlotOcupado } from "@/types";
 import type { DatosReserva } from "./ReservarPage";
 
 interface Props {
@@ -33,7 +33,7 @@ export function Paso2Horario({ onNext, onBack }: Props) {
   const [fecha, setFecha] = useState(DateUtils.fechaHoy());
   const [horaInicio, setHoraInicio] = useState("");
   const [horaFin, setHoraFin] = useState("");
-  const [reservasOcupadas, setReservasOcupadas] = useState<Reserva[]>([]);
+  const [reservasOcupadas, setReservasOcupadas] = useState<SlotOcupado[]>([]);
   const [cargandoDisp, setCargandoDisp] = useState(false);
   const [errors, setErrors] = useState<Errors>(PASO2_EMPTY);
 
@@ -57,7 +57,9 @@ export function Paso2Horario({ onNext, onBack }: Props) {
 
   function estaOcupado(hora: string) {
     return reservasOcupadas.some(
-      (r) => hora >= r.horaInicio && hora < r.horaFin,
+      (r) =>
+        hora >= DateUtils.formatearHora(r.horaInicio) &&
+        hora < DateUtils.formatearHora(r.horaFin),
     );
   }
   function esPasado(hora: string) {
