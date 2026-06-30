@@ -20,13 +20,20 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (res) => res,
   (err) => {
-    const msg = err.response?.data?.message ?? "Error en la petición";
-    if (err.response?.status === 401) {
+    const data = err.response?.data?.message;
+    // NestJS puede mandar `message` como string o como array (validaciones): normalizamos.
+    const msg = Array.isArray(data) ? data.join(", ") : (data ?? "Error en la petición");
+    const status: number | undefined = err.response?.status;
+    if (status === 401) {
       const hadSession = !!localStorage.getItem("sesion");
       localStorage.removeItem("sesion");
       if (hadSession) window.location.href = "/login";
     }
-    return Promise.reject(new Error(msg));
+    // Conservamos el status HTTP en el Error para que las pantallas puedan reaccionar
+    // distinto según el código (ej. 409 conflicto, 400 cancha no disponible).
+    const error = new Error(msg) as Error & { status?: number };
+    error.status = status;
+    return Promise.reject(error);
   },
 );
 

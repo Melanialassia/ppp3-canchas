@@ -73,12 +73,16 @@ export function Paso3Resumen({ cliente, reserva, onBack, onCreated }: Props) {
       mostrar("¡Reserva creada! Pagá la seña para confirmarla.", "success");
       onCreated(creada);
     } catch (err) {
-      mostrar(
-        (err as Error).message ||
-          "Error al crear la reserva. Intentá de nuevo.",
-        "error",
-      );
+      const e = err as Error & { status?: number };
+      const msg = e.message || "Error al crear la reserva. Intentá de nuevo.";
+      mostrar(msg, "error");
       setEnviando(false);
+      // La cancha pasó a mantenimiento/fuera de servicio entre la selección y el envío
+      // (el backend la rechaza con 400). Volvemos al Paso 2, que recarga la lista de
+      // canchas disponibles al remontarse.
+      if (e.status === 400 && /no admite reservas/i.test(msg)) {
+        onBack();
+      }
     }
   }
 
