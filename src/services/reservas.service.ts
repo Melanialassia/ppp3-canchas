@@ -1,5 +1,5 @@
 import api from "./api";
-import type { Reserva } from '@/types'
+import type { Reserva, SlotOcupado } from '@/types'
 
 export const ReservasService = {
   async obtenerTodas(params: Record<string, string> = {}): Promise<Reserva[]> {
@@ -14,12 +14,12 @@ export const ReservasService = {
 
   async verificarDisponibilidad(
     fecha: string,
-    canchaId?: number,
-  ): Promise<Reserva[]> {
-    const params: Record<string, string> = { fecha };
-    if (canchaId) params.canchaId = String(canchaId);
-    const { data } = await api.get("/reservas", { params });
-    return data;
+    canchaId: number,
+  ): Promise<SlotOcupado[]> {
+    const { data } = await api.get("/disponibilidad", {
+      params: { fecha, canchaId: String(canchaId) },
+    });
+    return data.ocupados ?? [];
   },
 
   async crear(datos: Partial<Reserva>): Promise<Reserva> {

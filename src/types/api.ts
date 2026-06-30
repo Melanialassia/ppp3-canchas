@@ -29,6 +29,12 @@ export interface Reserva {
   fechaCreacion?: string
 }
 
+export interface SlotOcupado {
+  horaInicio: string
+  horaFin: string
+  estado: EstadoReserva
+}
+
 export type EstadoCliente = 'activo' | 'suspendido' | 'bloqueado'
 
 export interface Cliente {
