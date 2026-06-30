@@ -49,9 +49,15 @@ src/
 ├── hooks/              # Hooks personalizados de datos
 ├── services/           # Clientes HTTP por dominio (Axios)
 ├── types/              # Tipos TypeScript compartidos
+├── utils/              # Funciones utilitarias puras
+│   ├── date.utils.ts       # Formateo de fechas en español, duración
+│   ├── money.utils.ts      # Formateo de precios en ARS, cálculo de seña
+│   ├── estado.utils.ts     # Labels de estados de reserva/cancha
+│   ├── horario.utils.ts    # Validación de horarios disponibles
+│   └── reservas.utils.ts   # Helpers de reservas
 ├── mock/               # Datos y constantes de configuración
 └── lib/
-    └── utils.ts        # Utilidades generales
+    └── utils.ts        # Utilidades generales (clsx, etc.)
 ```
 
 ---
@@ -95,7 +101,11 @@ src/
 Crear un archivo `.env` en la raíz del proyecto:
 
 ```env
-VITE_API_URL=http://localhost:3000
+# Producción
+VITE_API_URL=
+
+# Desarrollo local
+# VITE_API_URL=http://localhost:3000
 ```
 
 ---
